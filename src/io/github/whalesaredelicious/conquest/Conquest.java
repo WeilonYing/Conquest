@@ -16,12 +16,18 @@
 
 package io.github.whalesaredelicious.conquest;
 
+import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.logging.Level;
+import static java.util.logging.Level.SEVERE;
+import java.util.logging.Logger;
+import static java.util.logging.Logger.getLogger;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 
 /**
  *
@@ -35,6 +41,14 @@ public class Conquest extends JFrame {
     private JButton btnMoveLeft = new JButton("Left");
     private JButton btnMoveRight = new JButton("Right");
     
+    private JButton btnSelectUnit1 = new JButton("Unit 1");
+    private JButton btnSelectUnit2 = new JButton("Unit 2");
+    private JButton btnSelectUnit3 = new JButton("Unit 3");
+    
+    private JLabel lblUnit1Power = new JLabel("0");
+    private JLabel lblUnit2Power = new JLabel("0");
+    private JLabel lblUnit3Power = new JLabel("0");
+    
     /**
      * Creates new form Conquest
      */
@@ -43,70 +57,176 @@ public class Conquest extends JFrame {
         
         initComponents();
         initControls();
+        initLabels();
         
         setLayout(null);
         setResizable(false);
-        setSize(600, 400);
-        
-        
+        setSize(500, 300);
+        setAlwaysOnTop(true);
     }
-    public void initControls() {
+    
+    //Main method
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (Exception ex) {
+            getLogger(Conquest.class.getName()).log(SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new Conquest().setVisible(true);
+                new ConquestMap().setVisible(true);
+            }
+        });
+    }
+    
+    //Log method - not necessary, but makes typing out code for printing to console easier.
+    public static void log(String message) {
+        System.out.println(message);
+    }
+    
+    //Initialisation methods - setting up GUI elements
+    private void initControls() {
+        /*
+            Higher-level method
+            ====================
+            Oversees the initialisation, setting parameters, creating
+            Action Listeners and finally adding controls to the
+            window.
+        */
+        
         //Create ActionListeners
-        btnMoveUp.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                btnMoveUpPressed(evt);
-            }
-        });
-        
-        btnMoveDown.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                btnMoveDownPressed(evt);
-            }
-        });
-        
-        btnMoveLeft.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                btnMoveLeftPressed(evt);
-            }
-        });
-        
-        btnMoveRight.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                btnMoveRightPressed(evt);
-            }
-        });
-        //Set locations of buttons
-        Insets inset = getInsets(); //Get window borders
-        
-        //button.setBounds(LocationX, LocationY, SizeX, SizeY
-        int boundaryX = getSize().width, boundaryY = getSize().height;
-        //btnMoveUp.setBounds((boundaryX - 200), (boundaryY - 300), 60, 60);
-        //btnMoveDown.setBounds((boundaryX - 200), (boundaryY - 300), 60, 60);
-        //btnMoveLeft.setBounds((boundaryX - 200), (boundaryY - 300), 60, 60);
-        btnMoveRight.setBounds((boundaryX - 200), (boundaryY - 300), 60, 60);
-        
+        initActionListeners();
+        setButtonParameters();
+
         //Add the buttons to the screen
         add(btnMoveUp);
         add(btnMoveDown);
         add(btnMoveLeft);
         add(btnMoveRight);
+        
+        add(btnSelectUnit1);
+        add(btnSelectUnit2);
+        add(btnSelectUnit3);
+    }
+    private void initActionListeners() { //Create ActionListeners
+        /*
+            Action Listeners are needed for registering a button click event to the program.
+        */
+        btnMoveUp.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                btnMoveUpPressed(evt);
+            }
+        });
+        btnMoveDown.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                btnMoveDownPressed(evt);
+            }
+        });
+        btnMoveLeft.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                btnMoveLeftPressed(evt);
+            }
+        });
+        btnMoveRight.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                btnMoveRightPressed(evt);
+            }
+        });
+        
+        btnSelectUnit1.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                btnSelectUnit1Pressed(evt);
+            }
+        });
+        btnSelectUnit2.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                btnSelectUnit2Pressed(evt);
+            }
+        });
+        btnSelectUnit3.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                btnSelectUnit3Pressed(evt);
+            }
+        });
+    }
+    private void initLabels() {
+        /*
+            Used for setting up labels for displaying relevant info.
+        */
+        setLabelParameters();
+        
+        add(lblUnit1Power);
+        add(lblUnit2Power);
+        add(lblUnit3Power);
+    }
+    private void setButtonParameters() {
+        //Sets the size and location of the buttons.
+
+        //button.setBounds(LocationX, LocationY, SizeX, SizeY
+        int boundaryX = this.getSize().width, boundaryY = this.getSize().height;
+
+        btnMoveUp.setBounds((boundaryX - 160), (boundaryY - 240), 60, 60);
+        btnMoveDown.setBounds((boundaryX - 160), (boundaryY - 140), 60, 60);
+        btnMoveLeft.setBounds((boundaryX - 225), (boundaryY - 190), 60, 60);
+        btnMoveRight.setBounds((boundaryX - 100), (boundaryY - 190), 60, 60);
+
+        btnSelectUnit1.setBounds((boundaryX - 450), (boundaryY - 220), 100, 40);
+        btnSelectUnit2.setBounds((boundaryX - 450), (boundaryY - 170), 100, 40);
+        btnSelectUnit3.setBounds((boundaryX - 450), (boundaryY - 120), 100, 40);
+    }
+    private void setLabelParameters() {
+        //Sets the size and location of the labels.
+        
+        //label.setBounds(LocationX, LocationY, SizeX, SizeY
+        int boundaryX = this.getSize().width, boundaryY = this.getSize().height;
+        
+        lblUnit1Power.setBounds(boundaryX - 475, boundaryY - 205, 10, 10);
+        lblUnit2Power.setBounds(boundaryX - 475, boundaryY - 155, 10, 10);
+        lblUnit3Power.setBounds(boundaryX - 475, boundaryY - 105, 10, 10);
+    }
+    
+    private void selectUnit(int unitNumber) {
+        
     }
     
     //ActionEvent Responders
     private void btnMoveUpPressed(ActionEvent evt) {
         //Do stuff here
+        ConquestMap.move(1);
     }
     private void btnMoveDownPressed(ActionEvent evt) {
-        //Do stuff here
+        ConquestMap.move(3);
     }
     private void btnMoveLeftPressed(ActionEvent evt) {
-        //Do stuff here
+        ConquestMap.move(4);
     }
     private void btnMoveRightPressed(ActionEvent evt) {
         //Do stuff here
-        ConquestMap.moveRight();
+        ConquestMap.move(2);
     }
-    
+    private void btnSelectUnit1Pressed(ActionEvent evt) {
+        //Do stuff here
+    }
+    private void btnSelectUnit2Pressed(ActionEvent evt) {
+        //Do stuff here
+    }
+    private void btnSelectUnit3Pressed(ActionEvent evt) {
+        //Do stuff here
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -123,56 +243,16 @@ public class Conquest extends JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 600, Short.MAX_VALUE)
+            .addGap(0, 500, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGap(0, 300, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Conquest.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Conquest.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Conquest.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Conquest.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new Conquest().setVisible(true);
-                new ConquestMap().setVisible(true);
-            }
-        });
-    }
-    
-    public static void log(String message) {
-        System.out.println(message);
-    }
-
+    // Auto-generated code below.
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
 }

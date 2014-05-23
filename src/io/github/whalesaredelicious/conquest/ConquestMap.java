@@ -16,17 +16,33 @@
 
 package io.github.whalesaredelicious.conquest;
 
-/**
- *
- * @author Weilon
- */
-public class ConquestMap extends javax.swing.JFrame {
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 
+public class ConquestMap extends JFrame {
+    private int unitStartingCount = 3; //3 slots
+    private JLabel[] units1, units2;
+    
+    public int selectedUnitNumber = 1;
+    
     /**
      * Creates new form ConquestMap
      */
     public ConquestMap() {
+        super("Conquest (Map)");
         initComponents();
+        setSize(800, 600);
+        setResizable(false);
+        initUnits();
+    }
+    public void initUnits() {
+        units1 = new JLabel[unitStartingCount];
+        for (int i = 0; i < units1.length; i++) {
+            //units1[i] = this.getComponents(i);
+        }
     }
 
     /**
@@ -38,36 +54,55 @@ public class ConquestMap extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
+        lblUnit1_1 = new javax.swing.JLabel();
+        lblUnit1_2 = new javax.swing.JLabel();
+        lblUnit1_3 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jLabel1.setText("Placeholder");
+        lblUnit1_1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/io/github/whalesaredelicious/conquest/assets/soldier.png"))); // NOI18N
+
+        lblUnit1_2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/io/github/whalesaredelicious/conquest/assets/soldier.png"))); // NOI18N
+
+        lblUnit1_3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/io/github/whalesaredelicious/conquest/assets/soldier.png"))); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(65, 65, 65)
-                .addComponent(jLabel1)
-                .addContainerGap(280, Short.MAX_VALUE))
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblUnit1_1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(lblUnit1_2))
+                    .addComponent(lblUnit1_3))
+                .addContainerGap(684, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(51, 51, 51)
-                .addComponent(jLabel1)
-                .addContainerGap(235, Short.MAX_VALUE))
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblUnit1_1)
+                    .addComponent(lblUnit1_2))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lblUnit1_3)
+                .addContainerGap(482, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    /**
-     * @param args the command line arguments
-     */
+    //The main method - used if this class is not called from Conquest.java for any reason
     public static void main(String args[]) {
+        msgBox("The Map can only be opened from the main program. Please run "
+                + "Conquest by double clicking Conquest.jar instead", "Error", "error");
+        System.exit(0);
+        
+        //Backup code if the user bypasses System.exit(0) somehow.
+        msgBox("Conquest is running incorrectly. Please close this program "
+                + "and notify the developer", "Warning", "warning");
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -98,15 +133,63 @@ public class ConquestMap extends javax.swing.JFrame {
             }
         });
     }
-    public static void moveRight() {
-        jLabel1.setLocation(jLabel1.getLocation().x + 50, jLabel1.getLocation().y);
-        log("move right");
+    public static void move(int movedirection) {
+        //1 = up, 2 = right, 3 = down, 4 = left
+        /*int locX = lblUnit1_1.getLocation().x, locY = lblUnit1_1.getLocation().y;
+        int moveamount = 10;
+        switch (movedirection) {
+            case 1:
+                lblUnit1_1.setLocation(locX, locY - moveamount);
+                log("Move up");
+                break;
+            case 2:
+                lblUnit1_1.setLocation(locX + moveamount, locY);
+                log("Move right");
+                break;
+            case 3:
+                lblUnit1_1.setLocation(locX, locY + moveamount);
+                log("Move down");
+                break;
+            case 4:
+                lblUnit1_1.setLocation(locX - moveamount, locY);
+                log("Move left");
+                break;
+        }
+                */
     }
-    public static void log(String message) {
+    private static void log(String message) {
         System.out.println(message);
     }
-
+    private static void msgBox(String message, String title, String messageType) { //Method to make sending of message dialog boxes to the user easier to do.
+        if (messageType == null) { //If programmer is uninterested in looking up dialog box types, just use null.
+            JOptionPane.showMessageDialog(null, message, title, JOptionPane.PLAIN_MESSAGE);
+        }
+        else {
+            messageType = messageType.toLowerCase(); //Ensures strings with capitalised letters do not get misinterpreted.
+            switch (messageType) { //Use of simple keywords in order to make dialog box creation easier and less tedious.
+                case "info": //Information message dialog box
+                    JOptionPane.showMessageDialog(null, message, title, JOptionPane.INFORMATION_MESSAGE);
+                    break;
+                case "warning": //Warning message dialog box
+                    JOptionPane.showMessageDialog(null, message, title, JOptionPane.WARNING_MESSAGE);
+                    break;
+                case "error": //Error message dialog box
+                    JOptionPane.showMessageDialog(null, message, title, JOptionPane.ERROR_MESSAGE);
+                    break;
+                case "plain": //Plain message dialog box
+                    JOptionPane.showMessageDialog(null, message, title, JOptionPane.PLAIN_MESSAGE);
+                    break;
+                default: //If messageType is not any of the above, default to plain message.
+                    log("messageType string value: " + messageType + " could not be recognised. Defaulting to plain message."); //Inform programmer of this.
+                    JOptionPane.showMessageDialog(null, message, title, JOptionPane.PLAIN_MESSAGE);
+                    break;
+            }
+        }
+    }
+    //Auto-generated code below.
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private static javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel lblUnit1_1;
+    private javax.swing.JLabel lblUnit1_2;
+    private javax.swing.JLabel lblUnit1_3;
     // End of variables declaration//GEN-END:variables
 }

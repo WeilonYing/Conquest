@@ -166,7 +166,6 @@ public class FileAccessor{
         System.out.println(message);
     }
     private static void msgBox(String message, String title, String messageType) { //Method to make sending of message dialog boxes to the user easier to do.
-        JOptionPane.showMessageDialog(null, message, title, JOptionPane.ERROR_MESSAGE);
         if (messageType == null) { //If programmer is uninterested in looking up dialog box types, just use null.
             JOptionPane.showMessageDialog(null, message, title, JOptionPane.PLAIN_MESSAGE);
         }
