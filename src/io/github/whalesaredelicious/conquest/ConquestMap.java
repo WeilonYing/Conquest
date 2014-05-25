@@ -24,7 +24,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 public class ConquestMap extends JFrame {
-    private static int moveAmount = 50;
+    private static int intMoveAmount = 60;
     
     /**
      * Creates new form ConquestMap
@@ -70,15 +70,6 @@ public class ConquestMap extends JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblUnit1_1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(lblUnit1_2))
-                    .addComponent(lblUnit1_3))
-                .addContainerGap(684, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -90,6 +81,14 @@ public class ConquestMap extends JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(lblUnit2_1)))
                 .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(lblUnit1_3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblUnit1_1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lblUnit1_2)
+                .addContainerGap(684, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -205,16 +204,16 @@ public class ConquestMap extends JFrame {
         pointNewLocation.y = unit.getLocation().y;
         switch (moveDirection) {
             case 1:
-                pointNewLocation.y = pointNewLocation.y - moveAmount;
+                pointNewLocation.y = pointNewLocation.y - intMoveAmount;
                 break;
             case 2:
-                pointNewLocation.x = pointNewLocation.x + moveAmount;
+                pointNewLocation.x = pointNewLocation.x + intMoveAmount;
                 break;
             case 3:
-                pointNewLocation.y = pointNewLocation.y + moveAmount;
+                pointNewLocation.y = pointNewLocation.y + intMoveAmount;
                 break;
             case 4:
-                pointNewLocation.x = pointNewLocation.x - moveAmount;
+                pointNewLocation.x = pointNewLocation.x - intMoveAmount;
                 break;
             default:
                 log("Invalid move direction");
