@@ -18,6 +18,7 @@ package io.github.whalesaredelicious.conquest;
 
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -34,8 +35,18 @@ import javax.swing.JLabel;
  * @author Weilon
  */
 public class Conquest extends JFrame {
+    //Declare strings, booleans, and integers
+    public String stringPlayerTurn;
+    private String stringPlayer1 = "Player 1";
+    private String stringPlayer2 = "Player 2";
     
-    //Initialise control buttons
+    public int intNumMoves;
+    
+    public static boolean booleanIsPlayer1Turn = true;
+    public static boolean[] booleanPlayer1UnitSelected = new boolean[3];
+    public static boolean[] booleanPlayer2UnitSelected = new boolean[3];
+    
+    //Declare control buttons
     private JButton btnMoveUp = new JButton("Up");
     private JButton btnMoveDown = new JButton("Down");
     private JButton btnMoveLeft = new JButton("Left");
@@ -45,11 +56,21 @@ public class Conquest extends JFrame {
     private JButton btnSelectUnit2 = new JButton("Unit 2");
     private JButton btnSelectUnit3 = new JButton("Unit 3");
     
+    private JButton btnRollDice = new JButton("Roll Dice");
+    
+    //Declare labels
     private JLabel lblUnit1Power = new JLabel("0");
     private JLabel lblUnit2Power = new JLabel("0");
     private JLabel lblUnit3Power = new JLabel("0");
     
+    private JLabel lblWhoseTurn = new JLabel("Turn: " + stringPlayerTurn);
+    private JLabel lblNumMoves = new JLabel("No. of moves left: " + Integer.toString(intNumMoves));
+    private JLabel lblPlayer1 = new JLabel(stringPlayer1, JLabel.CENTER);
+    private JLabel lblPlayer2 = new JLabel(stringPlayer2, JLabel.CENTER);
+    private JLabel lblVs = new JLabel("vs.", JLabel.CENTER);
+    
     /**
+     * Constructor method.
      * Creates new form Conquest
      */
     public Conquest() {
@@ -61,7 +82,7 @@ public class Conquest extends JFrame {
         
         setLayout(null);
         setResizable(false);
-        setSize(500, 300);
+        setSize(500, 400);
         setAlwaysOnTop(true);
     }
     
@@ -101,11 +122,9 @@ public class Conquest extends JFrame {
     //Initialisation methods - setting up GUI elements
     private void initControls() {
         /*
-            Higher-level method
-            ====================
-            Oversees the initialisation, setting parameters, creating
-            Action Listeners and finally adding controls to the
-            window.
+            Higher-level method that oversees the initialisation
+            setting parameters, creating ActionListeners and
+            finally adding controls to the window.
         */
         
         //Create ActionListeners
@@ -172,6 +191,12 @@ public class Conquest extends JFrame {
         add(lblUnit1Power);
         add(lblUnit2Power);
         add(lblUnit3Power);
+        
+        add(lblWhoseTurn);
+        add(lblNumMoves);
+        add(lblPlayer1);
+        add(lblPlayer2);
+        add(lblVs);
     }
     private void setButtonParameters() {
         //Sets the size and location of the buttons.
@@ -197,10 +222,38 @@ public class Conquest extends JFrame {
         lblUnit1Power.setBounds(boundaryX - 475, boundaryY - 205, 10, 10);
         lblUnit2Power.setBounds(boundaryX - 475, boundaryY - 155, 10, 10);
         lblUnit3Power.setBounds(boundaryX - 475, boundaryY - 105, 10, 10);
+        
+        lblWhoseTurn.setBounds(boundaryX - 475, boundaryY - 50, 200, 30);
+        lblNumMoves.setBounds(boundaryX - 475, boundaryY - 20, 200, 30);
+        
+        lblPlayer1.setBounds(boundaryX - 500, boundaryY - 300, 150, 30);
+        lblPlayer2.setBounds(boundaryX - 200, boundaryY - 300, 150, 30);
+        lblVs.setBounds(boundaryX - 300, boundaryY - 300, 30, 30);
+        
+        //Sets the font parameters of the labels. By default it is serif, plain and font size 10
+        Font fontStandard = new Font("sans-serif", Font.PLAIN, 16);
+        lblWhoseTurn.setFont(fontStandard);
+        lblNumMoves.setFont(fontStandard);
+        
+        lblPlayer1.setFont(fontStandard);
+        lblPlayer2.setFont(fontStandard);
+        lblVs.setFont(fontStandard);
+        
     }
     
     private void selectUnit(int unitNumber) {
-        
+        if (booleanIsPlayer1Turn) {
+            for (int i = 0; i < booleanPlayer1UnitSelected.length; i++) {
+                booleanPlayer1UnitSelected[i] = false;
+            }
+            booleanPlayer1UnitSelected[unitNumber] = true;
+        }
+        else {
+            for (int i = 0; i < booleanPlayer2UnitSelected.length; i++) {
+                booleanPlayer2UnitSelected[i] = false;
+            }
+            booleanPlayer2UnitSelected[unitNumber] = true;
+        }
     }
     
     //ActionEvent Responders
@@ -219,15 +272,15 @@ public class Conquest extends JFrame {
         ConquestMap.move(2);
     }
     private void btnSelectUnit1Pressed(ActionEvent evt) {
-        //Do stuff here
+        selectUnit(0);
     }
     private void btnSelectUnit2Pressed(ActionEvent evt) {
-        //Do stuff here
+        selectUnit(1);
     }
     private void btnSelectUnit3Pressed(ActionEvent evt) {
-        //Do stuff here
+        selectUnit(2);
     }
-
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always

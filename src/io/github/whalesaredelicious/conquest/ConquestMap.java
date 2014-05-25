@@ -16,6 +16,7 @@
 
 package io.github.whalesaredelicious.conquest;
 
+import java.awt.Point;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -23,10 +24,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 public class ConquestMap extends JFrame {
-    private int unitStartingCount = 3; //3 slots
-    private JLabel[] units1, units2;
-    
-    public int selectedUnitNumber = 1;
+    private static int moveAmount = 50;
     
     /**
      * Creates new form ConquestMap
@@ -36,13 +34,6 @@ public class ConquestMap extends JFrame {
         initComponents();
         setSize(800, 600);
         setResizable(false);
-        initUnits();
-    }
-    public void initUnits() {
-        units1 = new JLabel[unitStartingCount];
-        for (int i = 0; i < units1.length; i++) {
-            //units1[i] = this.getComponents(i);
-        }
     }
 
     /**
@@ -57,6 +48,9 @@ public class ConquestMap extends JFrame {
         lblUnit1_1 = new javax.swing.JLabel();
         lblUnit1_2 = new javax.swing.JLabel();
         lblUnit1_3 = new javax.swing.JLabel();
+        lblUnit2_1 = new javax.swing.JLabel();
+        lblUnit2_2 = new javax.swing.JLabel();
+        lblUnit2_3 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -65,6 +59,12 @@ public class ConquestMap extends JFrame {
         lblUnit1_2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/io/github/whalesaredelicious/conquest/assets/soldier.png"))); // NOI18N
 
         lblUnit1_3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/io/github/whalesaredelicious/conquest/assets/soldier.png"))); // NOI18N
+
+        lblUnit2_1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/io/github/whalesaredelicious/conquest/assets/soldier.png"))); // NOI18N
+
+        lblUnit2_2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/io/github/whalesaredelicious/conquest/assets/soldier.png"))); // NOI18N
+
+        lblUnit2_3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/io/github/whalesaredelicious/conquest/assets/soldier.png"))); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -79,17 +79,37 @@ public class ConquestMap extends JFrame {
                         .addComponent(lblUnit1_2))
                     .addComponent(lblUnit1_3))
                 .addContainerGap(684, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(58, 58, 58)
+                        .addComponent(lblUnit2_3))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblUnit2_2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(lblUnit2_1)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblUnit1_1)
-                    .addComponent(lblUnit1_2))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(lblUnit1_3)
-                .addContainerGap(482, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(lblUnit2_1))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblUnit1_1)
+                            .addComponent(lblUnit1_2))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(lblUnit1_3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 364, Short.MAX_VALUE)
+                        .addComponent(lblUnit2_3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(lblUnit2_2)))
+                .addContainerGap())
         );
 
         pack();
@@ -133,29 +153,74 @@ public class ConquestMap extends JFrame {
             }
         });
     }
-    public static void move(int movedirection) {
+    public static void prepareMove(int movedirection) {
+        
+    }
+    public static void move(int moveDirection) {
         //1 = up, 2 = right, 3 = down, 4 = left
-        /*int locX = lblUnit1_1.getLocation().x, locY = lblUnit1_1.getLocation().y;
-        int moveamount = 10;
-        switch (movedirection) {
+        if (Conquest.booleanIsPlayer1Turn) {
+            for (int i = 0; i < Conquest.booleanPlayer1UnitSelected.length; i++) {
+                if (Conquest.booleanPlayer1UnitSelected[i]) {
+                    moveUnit(i, moveDirection);
+                }
+            }
+        }
+        else {
+            for (int i = 0; i < Conquest.booleanPlayer2UnitSelected.length; i++) {
+                if (Conquest.booleanPlayer2UnitSelected[i]) {
+                    moveUnit(i + 3, moveDirection);
+                }
+            }
+        }
+    }
+    private static void moveUnit(int unitSelected, int moveDirection) {
+        switch (unitSelected) {
+            case 0:
+                lblUnit1_1.setLocation(newLocation(lblUnit1_1, moveDirection));
+                break;
             case 1:
-                lblUnit1_1.setLocation(locX, locY - moveamount);
-                log("Move up");
+                lblUnit1_2.setLocation(newLocation(lblUnit1_2, moveDirection));
                 break;
             case 2:
-                lblUnit1_1.setLocation(locX + moveamount, locY);
-                log("Move right");
+                lblUnit1_3.setLocation(newLocation(lblUnit1_3, moveDirection));
                 break;
             case 3:
-                lblUnit1_1.setLocation(locX, locY + moveamount);
-                log("Move down");
+                lblUnit2_1.setLocation(newLocation(lblUnit1_3, moveDirection));
                 break;
             case 4:
-                lblUnit1_1.setLocation(locX - moveamount, locY);
-                log("Move left");
+                lblUnit2_2.setLocation(newLocation(lblUnit1_3, moveDirection));
+                break;
+            case 5:
+                lblUnit2_3.setLocation(newLocation(lblUnit1_3, moveDirection));
+                break;
+            default:
+                log("Invalid unit selection");
                 break;
         }
-                */
+    }
+    private static Point newLocation(JLabel unit, int moveDirection) {
+        //1 = up, 2 = right, 3 = down, 4 = left
+        Point pointNewLocation = new Point();
+        pointNewLocation.x = unit.getLocation().x;
+        pointNewLocation.y = unit.getLocation().y;
+        switch (moveDirection) {
+            case 1:
+                pointNewLocation.y = pointNewLocation.y - moveAmount;
+                break;
+            case 2:
+                pointNewLocation.x = pointNewLocation.x + moveAmount;
+                break;
+            case 3:
+                pointNewLocation.y = pointNewLocation.y + moveAmount;
+                break;
+            case 4:
+                pointNewLocation.x = pointNewLocation.x - moveAmount;
+                break;
+            default:
+                log("Invalid move direction");
+                break;
+        }
+        return pointNewLocation;
     }
     private static void log(String message) {
         System.out.println(message);
@@ -188,8 +253,11 @@ public class ConquestMap extends JFrame {
     }
     //Auto-generated code below.
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel lblUnit1_1;
-    private javax.swing.JLabel lblUnit1_2;
-    private javax.swing.JLabel lblUnit1_3;
+    private static javax.swing.JLabel lblUnit1_1;
+    private static javax.swing.JLabel lblUnit1_2;
+    private static javax.swing.JLabel lblUnit1_3;
+    private static javax.swing.JLabel lblUnit2_1;
+    private static javax.swing.JLabel lblUnit2_2;
+    private static javax.swing.JLabel lblUnit2_3;
     // End of variables declaration//GEN-END:variables
 }
