@@ -37,8 +37,8 @@ import javax.swing.JLabel;
 public class Conquest extends JFrame {
     //Declare strings, booleans, and integers
     public String stringPlayerTurn;
-    private String stringPlayer1 = "Player 1";
-    private String stringPlayer2 = "Player 2";
+    public static String stringPlayer1 = "Player 1";
+    public static String stringPlayer2 = "Player 2";
     
     public int intNumMoves;
     
@@ -57,6 +57,7 @@ public class Conquest extends JFrame {
     private JButton btnSelectUnit3 = new JButton("Unit 3");
     
     private JButton btnRollDice = new JButton("Roll Dice");
+    private JButton btnEndTurn = new JButton("End Turn");
     
     //Declare labels
     private JLabel lblUnit1Power = new JLabel("0");
@@ -108,6 +109,9 @@ public class Conquest extends JFrame {
         /* Create and display the form */
         EventQueue.invokeLater(new Runnable() {
             public void run() {
+                ConquestStart start = new ConquestStart(null, true);
+                start.setVisible(true);
+                
                 new Conquest().setVisible(true);
                 new ConquestMap().setVisible(true);
             }
@@ -140,6 +144,9 @@ public class Conquest extends JFrame {
         add(btnSelectUnit1);
         add(btnSelectUnit2);
         add(btnSelectUnit3);
+        
+        add(btnEndTurn);
+        add(btnRollDice);
     }
     private void initActionListeners() { //Create ActionListeners
         /*
@@ -181,6 +188,12 @@ public class Conquest extends JFrame {
                 btnSelectUnit3Pressed(evt);
             }
         });
+        
+        btnEndTurn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                btnEndTurnPressed(evt);
+            }
+        });
     }
     private void initLabels() {
         /*
@@ -212,6 +225,8 @@ public class Conquest extends JFrame {
         btnSelectUnit1.setBounds((boundaryX - 450), (boundaryY - 220), 100, 40);
         btnSelectUnit2.setBounds((boundaryX - 450), (boundaryY - 170), 100, 40);
         btnSelectUnit3.setBounds((boundaryX - 450), (boundaryY - 120), 100, 40);
+        
+        btnEndTurn.setBounds((boundaryX - 150), (boundaryY - 20), 100, 40);
     }
     private void setLabelParameters() {
         //Sets the size and location of the labels.
@@ -255,8 +270,25 @@ public class Conquest extends JFrame {
             booleanPlayer2UnitSelected[unitNumber] = true;
         }
     }
+    private void changeTurn() {
+        //Switch turn
+        if (booleanIsPlayer1Turn) {
+            booleanIsPlayer1Turn = false;
+        }
+        else {
+            booleanIsPlayer1Turn = true;
+        }
+        
+        //Reset selected units
+        for (int i = 0; i < booleanPlayer1UnitSelected.length; i++) {
+            booleanPlayer1UnitSelected[i] = false;
+        }
+        for (int i = 0; i < booleanPlayer2UnitSelected.length; i++) {
+            booleanPlayer2UnitSelected[i] = false;
+        }
+    }
     
-    //ActionEvent Responders
+    //ActionEvent Responders - event driven methods for responding to button presses
     private void btnMoveUpPressed(ActionEvent evt) {
         //Do stuff here
         ConquestMap.move(1);
@@ -279,6 +311,9 @@ public class Conquest extends JFrame {
     }
     private void btnSelectUnit3Pressed(ActionEvent evt) {
         selectUnit(2);
+    }
+    private void btnEndTurnPressed(ActionEvent evt) {
+        changeTurn();
     }
     
     /**

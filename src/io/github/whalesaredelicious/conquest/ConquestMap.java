@@ -25,6 +25,16 @@ import javax.swing.JOptionPane;
 
 public class ConquestMap extends JFrame {
     private static int intMoveAmount = 60;
+    private static Point[][] pointLocation = new Point[15][10];
+    
+    public static int[][] intUnit1_1Coords = new int[15][10];
+    public static int[][] intUnit1_2Coords = new int[15][10];
+    public static int[][] intUnit1_3Coords = new int[15][10];
+    public static int[][] intUnit2_1Coords = new int[15][10];
+    public static int[][] intUnit2_2Coords = new int[15][10];
+    public static int[][] intUnit2_3Coords = new int[15][10];
+    
+    public static boolean[][] booleanGridOccupied = new boolean[15][10];
     
     /**
      * Creates new form ConquestMap
@@ -32,7 +42,8 @@ public class ConquestMap extends JFrame {
     public ConquestMap() {
         super("Conquest (Map)");
         initComponents();
-        setSize(800, 600);
+        initLocations();
+        setSize(900, 600);
         setResizable(false);
     }
 
@@ -88,7 +99,7 @@ public class ConquestMap extends JFrame {
                     .addComponent(lblUnit1_1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(lblUnit1_2)
-                .addContainerGap(684, Short.MAX_VALUE))
+                .addContainerGap(784, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -152,8 +163,8 @@ public class ConquestMap extends JFrame {
             }
         });
     }
-    public static void prepareMove(int movedirection) {
-        
+    public static void moveTest() {
+        lblUnit1_1.setLocation(pointLocation[6][9]);
     }
     public static void move(int moveDirection) {
         //1 = up, 2 = right, 3 = down, 4 = left
@@ -184,13 +195,13 @@ public class ConquestMap extends JFrame {
                 lblUnit1_3.setLocation(newLocation(lblUnit1_3, moveDirection));
                 break;
             case 3:
-                lblUnit2_1.setLocation(newLocation(lblUnit1_3, moveDirection));
+                lblUnit2_1.setLocation(newLocation(lblUnit2_1, moveDirection));
                 break;
             case 4:
-                lblUnit2_2.setLocation(newLocation(lblUnit1_3, moveDirection));
+                lblUnit2_2.setLocation(newLocation(lblUnit2_2, moveDirection));
                 break;
             case 5:
-                lblUnit2_3.setLocation(newLocation(lblUnit1_3, moveDirection));
+                lblUnit2_3.setLocation(newLocation(lblUnit2_3, moveDirection));
                 break;
             default:
                 log("Invalid unit selection");
@@ -220,6 +231,30 @@ public class ConquestMap extends JFrame {
                 break;
         }
         return pointNewLocation;
+    }
+    private void initLocations() {
+        initPointLocation();
+        initUnitCoords();
+        initGridOccupied();
+    }
+    private void initPointLocation() {
+        //Make possible location points
+        //Grid is 15 x 10.
+        for (int x = 0; x < pointLocation.length; x++) {
+            for (int y = 0; y < pointLocation[y].length; y++) {
+                pointLocation[x][y] = new Point();
+                log(Integer.toString(x) + ", " + Integer.toString(y));
+                pointLocation[x][y].x = x * 60;
+                pointLocation[x][y].y = y * 60;
+                
+            }
+        }
+    }
+    private void initUnitCoords() {
+        
+    }
+    private void initGridOccupied() {
+        
     }
     private static void log(String message) {
         System.out.println(message);
