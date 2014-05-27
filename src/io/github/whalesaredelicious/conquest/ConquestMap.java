@@ -24,7 +24,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 public class ConquestMap extends JFrame {
-    private static int intMoveAmount = 60;
+    private static int intMoveAmount = 50;
     private static Point[][] pointLocation = new Point[15][10];
     
     public static int[][] intUnit1_1Coords = new int[15][10];
@@ -43,7 +43,7 @@ public class ConquestMap extends JFrame {
         super("Conquest (Map)");
         initComponents();
         initLocations();
-        setSize(900, 600);
+        setSize(905, 600);
         setResizable(false);
     }
 
@@ -64,63 +64,31 @@ public class ConquestMap extends JFrame {
         lblUnit2_3 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        getContentPane().setLayout(null);
 
         lblUnit1_1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/io/github/whalesaredelicious/conquest/assets/soldier.png"))); // NOI18N
+        getContentPane().add(lblUnit1_1);
+        lblUnit1_1.setBounds(10, 10, 60, 60);
 
         lblUnit1_2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/io/github/whalesaredelicious/conquest/assets/soldier.png"))); // NOI18N
+        getContentPane().add(lblUnit1_2);
+        lblUnit1_2.setBounds(76, 11, 60, 60);
 
         lblUnit1_3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/io/github/whalesaredelicious/conquest/assets/soldier.png"))); // NOI18N
+        getContentPane().add(lblUnit1_3);
+        lblUnit1_3.setBounds(10, 77, 60, 60);
 
         lblUnit2_1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/io/github/whalesaredelicious/conquest/assets/soldier.png"))); // NOI18N
+        getContentPane().add(lblUnit2_1);
+        lblUnit2_1.setBounds(835, 529, 60, 60);
 
         lblUnit2_2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/io/github/whalesaredelicious/conquest/assets/soldier.png"))); // NOI18N
+        getContentPane().add(lblUnit2_2);
+        lblUnit2_2.setBounds(769, 529, 60, 60);
 
         lblUnit2_3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/io/github/whalesaredelicious/conquest/assets/soldier.png"))); // NOI18N
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(58, 58, 58)
-                        .addComponent(lblUnit2_3))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblUnit2_2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(lblUnit2_1)))
-                .addContainerGap())
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(lblUnit1_3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lblUnit1_1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(lblUnit1_2)
-                .addContainerGap(784, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(lblUnit2_1))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblUnit1_1)
-                            .addComponent(lblUnit1_2))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(lblUnit1_3)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 364, Short.MAX_VALUE)
-                        .addComponent(lblUnit2_3)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(lblUnit2_2)))
-                .addContainerGap())
-        );
+        getContentPane().add(lblUnit2_3);
+        lblUnit2_3.setBounds(835, 470, 60, 60);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -162,6 +130,15 @@ public class ConquestMap extends JFrame {
                 new ConquestMap().setVisible(true);
             }
         });
+    }
+    public void setUnitLocation() {
+        lblUnit1_1.setLocation(0, 0);
+        lblUnit1_2.setLocation(50, 0);
+        lblUnit1_3.setLocation(0, 50);
+        
+        lblUnit2_1.setLocation(850, 500);
+        lblUnit2_2.setLocation(800, 500);
+        lblUnit2_3.setLocation(850, 450);
     }
     public static void moveTest() {
         lblUnit1_1.setLocation(pointLocation[6][9]);

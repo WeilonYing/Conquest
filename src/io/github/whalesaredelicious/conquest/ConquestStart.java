@@ -212,7 +212,7 @@ public class ConquestStart extends JDialog {
             Conquest.stringPlayer2 = stringPlayer2Name;
             log("Name check cleared. Rolling the dice to see who goes first.");
             rollDice();
-            this.dispose();
+            this.dispose(); //Close the window
         }
     }
     private void rollDice() { //roll the dice to see who goes first
@@ -228,6 +228,7 @@ public class ConquestStart extends JDialog {
             //if player 1 roll > player 2 roll, player 1 goes first, and vice versa.
             if (intPlayer1Roll > intPlayer2Roll) {
                 Conquest.booleanIsPlayer1Turn = true;
+                Conquest.stringPlayerTurn = stringPlayer1Name;
                 msgBox(stringPlayer1Name + " has rolled a " + Integer.toString(intPlayer1Roll) 
                         + " and " + stringPlayer2Name + " has rolled a "
                         + Integer.toString(intPlayer2Roll) + ". " + stringPlayer1Name + 
@@ -236,6 +237,7 @@ public class ConquestStart extends JDialog {
             }
             if (intPlayer2Roll > intPlayer1Roll) {
                 Conquest.booleanIsPlayer1Turn = false;
+                Conquest.stringPlayerTurn = stringPlayer2Name;
                 msgBox(stringPlayer1Name + " has rolled a " + Integer.toString(intPlayer1Roll) 
                         + " and " + stringPlayer2Name + " has rolled a "
                         + Integer.toString(intPlayer2Roll) + ". " + stringPlayer2Name + 
