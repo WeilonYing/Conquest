@@ -38,6 +38,13 @@ public class Conquest extends JFrame {
     
     public int intNumMoves = 0;
     
+    public int intUnit1_1Power = 1;
+    public int intUnit1_2Power = 1;
+    public int intUnit1_3Power = 1;
+    public int intUnit2_1Power = 1;
+    public int intUnit2_2Power = 1;
+    public int intUnit2_3Power = 1;
+    
     public static boolean booleanIsPlayer1Turn = true;
     public static boolean[] booleanPlayer1UnitSelected = new boolean[3];
     public static boolean[] booleanPlayer2UnitSelected = new boolean[3];
@@ -52,6 +59,10 @@ public class Conquest extends JFrame {
     private JButton btnSelectUnit1 = new JButton("Unit 1");
     private JButton btnSelectUnit2 = new JButton("Unit 2");
     private JButton btnSelectUnit3 = new JButton("Unit 3");
+    
+    private JButton btnUpgradeUnit1 = new JButton("+");
+    private JButton btnUpgradeUnit2 = new JButton("+");
+    private JButton btnUpgradeUnit3 = new JButton("+");
     
     private JButton btnRollDice = new JButton("Roll Dice");
     private JButton btnEndTurn = new JButton("End Turn");
@@ -82,6 +93,8 @@ public class Conquest extends JFrame {
         setResizable(false);
         setSize(500, 400);
         setAlwaysOnTop(true);
+        setLocationRelativeTo(null);
+        setLblUnitPower();
     }
     
     //Main method
@@ -113,7 +126,7 @@ public class Conquest extends JFrame {
                 
                 ConquestMap conquestmap = new ConquestMap();
                 conquestmap.setVisible(true);
-                conquestmap.setUnitLocation();
+                conquestmap.initLocations();
             }
         });
     }
@@ -144,6 +157,10 @@ public class Conquest extends JFrame {
         add(btnSelectUnit1);
         add(btnSelectUnit2);
         add(btnSelectUnit3);
+        
+        add(btnUpgradeUnit1);
+        add(btnUpgradeUnit2);
+        add(btnUpgradeUnit3);
         
         add(btnEndTurn);
         add(btnRollDice);
@@ -186,6 +203,21 @@ public class Conquest extends JFrame {
         btnSelectUnit3.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 btnSelectUnit3Pressed(evt);
+            }
+        });
+        btnUpgradeUnit1.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                btnUpgradeUnit1Pressed(evt);
+            }
+        });
+        btnUpgradeUnit2.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                btnUpgradeUnit2Pressed(evt);
+            }
+        });
+        btnUpgradeUnit3.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                btnUpgradeUnit3Pressed(evt);
             }
         });
         
@@ -231,11 +263,21 @@ public class Conquest extends JFrame {
         btnSelectUnit2.setBounds((boundaryX - 450), (boundaryY - 170), 100, 40);
         btnSelectUnit3.setBounds((boundaryX - 450), (boundaryY - 120), 100, 40);
         
+        btnUpgradeUnit1.setBounds((boundaryX - 350), (boundaryY - 220), 40, 40);
+        btnUpgradeUnit2.setBounds((boundaryX - 350), (boundaryY - 170), 40, 40);
+        btnUpgradeUnit3.setBounds((boundaryX - 350), (boundaryY - 120), 40, 40);
+        
         btnEndTurn.setBounds((boundaryX - 150), (boundaryY - 20), 100, 40);
         btnRollDice.setBounds((boundaryX - 150), (boundaryY - 60), 100, 40);
+
+        //Set button fonts
+        Font fontBold = new Font("sans-serif", Font.BOLD, 18);
+        btnUpgradeUnit1.setFont(fontBold);
+        btnUpgradeUnit2.setFont(fontBold);
+        btnUpgradeUnit3.setFont(fontBold);
         
-        //Moving buttons are disabled 
-        toggleMoveButtonState(false);
+        //Move count related buttons are disabled initially
+        toggleMoveCountButtonState(false);
 
     }
     private void setLabelParameters() {
@@ -244,9 +286,9 @@ public class Conquest extends JFrame {
         //label.setBounds(LocationX, LocationY, SizeX, SizeY
         int boundaryX = this.getSize().width, boundaryY = this.getSize().height;
         
-        lblUnit1Power.setBounds(boundaryX - 475, boundaryY - 205, 10, 10);
-        lblUnit2Power.setBounds(boundaryX - 475, boundaryY - 155, 10, 10);
-        lblUnit3Power.setBounds(boundaryX - 475, boundaryY - 105, 10, 10);
+        lblUnit1Power.setBounds(boundaryX - 475, boundaryY - 205, 30, 10);
+        lblUnit2Power.setBounds(boundaryX - 475, boundaryY - 155, 30, 10);
+        lblUnit3Power.setBounds(boundaryX - 475, boundaryY - 105, 30, 10);
         
         lblWhoseTurn.setBounds(boundaryX - 475, boundaryY - 50, 200, 30);
         lblNumMoves.setBounds(boundaryX - 475, boundaryY - 20, 200, 30);
@@ -306,18 +348,31 @@ public class Conquest extends JFrame {
     private void btnSelectUnit3Pressed(ActionEvent evt) {
         selectUnit(2);
     }
+    private void btnUpgradeUnit1Pressed(ActionEvent evt) {
+        prepareUpgrade(1, 1);
+    }
+    private void btnUpgradeUnit2Pressed(ActionEvent evt) {
+        prepareUpgrade(2, 1);
+    }
+    private void btnUpgradeUnit3Pressed(ActionEvent evt) {
+        //Do stuff here
+    }
     private void btnEndTurnPressed(ActionEvent evt) {
         changeTurn();
     }
     private void btnRollDicePressed(ActionEvent evt) {
         rollDice();
     }
-    private void toggleMoveButtonState(boolean state) {
+    private void toggleMoveCountButtonState(boolean state) {
         //Greys out or re-enables the move buttons depending on its set parameter.
         btnMoveUp.setEnabled(state);
         btnMoveDown.setEnabled(state);
         btnMoveLeft.setEnabled(state);
         btnMoveRight.setEnabled(state);
+        
+        btnUpgradeUnit1.setEnabled(state);
+        btnUpgradeUnit2.setEnabled(state);
+        btnUpgradeUnit3.setEnabled(state);
     }
     private void changeTurn() {
         //Switch turn
@@ -341,7 +396,8 @@ public class Conquest extends JFrame {
         booleanUnitSelected = false;
         intNumMoves = 0;
         setNumTurnsLabel(intNumMoves);
-        toggleMoveButtonState(false);
+        setLblUnitPower();
+        toggleMoveCountButtonState(false);
         btnRollDice.setEnabled(true);
     }
     private void rollDice() { //Generate a random integer between 1-6
@@ -350,32 +406,105 @@ public class Conquest extends JFrame {
         setNumTurnsLabel(intNumMoves);
         
         //Re-enable the buttons
-        toggleMoveButtonState(true);
+        toggleMoveCountButtonState(true);
         
         //Disable the Roll Dice button after use.
         btnRollDice.setEnabled(false);
     }
     private void prepareMove(int moveDirection) { //Ensures a unit is selected before executing.
         if (booleanUnitSelected) {
-            if (processTurn(1)) {
+            if (processMove(1)) {
                 ConquestMap.move(moveDirection);
             }
         }
     }
-    private boolean processTurn(int amount) { //Checks if player has enough points to execute an action and subtracts the appropriate amount.
+    private void prepareUpgrade(int unitNumber, int upgradeAmount) { //Makes the relevant checks before processing the unit upgrade.
+        //If invalid unit selected, boolean flag will prevent a move being subtracted from the player.
+        boolean booleanUpgradeSuccessful = false;
+        if (booleanIsPlayer1Turn) {
+            switch (unitNumber) {
+                case 1:
+                    intUnit1_1Power += upgradeAmount;
+                    booleanUpgradeSuccessful = true;
+                    break;
+                case 2:
+                    intUnit1_2Power += upgradeAmount;
+                    booleanUpgradeSuccessful = true;
+                    break;
+                case 3:
+                    intUnit1_3Power += upgradeAmount;
+                    booleanUpgradeSuccessful = true;
+                    break;
+                default:
+                    log("Invalid unit number");
+                    break;
+            }
+        }
+        else {
+            switch (unitNumber) {
+                case 1:
+                    intUnit2_1Power += upgradeAmount;
+                    booleanUpgradeSuccessful = true;
+                    break;
+                case 2:
+                    intUnit2_2Power += upgradeAmount;
+                    booleanUpgradeSuccessful = true;
+                    break;
+                case 3:
+                    intUnit2_3Power += upgradeAmount;
+                    booleanUpgradeSuccessful = true;
+                    break;
+                default:
+                    log("Invalid unit number");
+            }
+        }
+        limitUnitPower();
+        setLblUnitPower();
+        
+        if (booleanUpgradeSuccessful) {
+            processMove(upgradeAmount);
+        }
+    }
+    private void limitUnitPower() {
+        /**
+         * If player somehow reaches a ridiculous amount of power,
+         * limit power to 9001 to prevent graphical glitches in the GUI.
+         * 9999 can be used too, but 9001 is better (Please don't take
+         * marks off for this!)
+         */
+        if (intUnit1_1Power > 9001) {intUnit1_1Power = 9001;}
+        if (intUnit1_2Power > 9001) {intUnit1_2Power = 9001;}
+        if (intUnit1_3Power > 9001) {intUnit1_3Power = 9001;}
+        if (intUnit2_1Power > 9001) {intUnit2_1Power = 9001;}
+        if (intUnit2_2Power > 9001) {intUnit2_2Power = 9001;}
+        if (intUnit2_3Power > 9001) {intUnit2_3Power = 9001;}
+    }
+    private void setLblUnitPower() {
+        if (booleanIsPlayer1Turn) {
+            lblUnit1Power.setText(Integer.toString(intUnit1_1Power));
+            lblUnit2Power.setText(Integer.toString(intUnit1_2Power));
+            lblUnit3Power.setText(Integer.toString(intUnit1_3Power));
+        }
+        else {
+            lblUnit1Power.setText(Integer.toString(intUnit2_1Power));
+            lblUnit2Power.setText(Integer.toString(intUnit2_2Power));
+            lblUnit3Power.setText(Integer.toString(intUnit2_3Power));
+        }
+    }
+    private boolean processMove(int amount) { //Checks if player has enough points to execute an action and subtracts the appropriate amount.
         if ((intNumMoves - amount) >= 0) { //Checks if amount to remove will still be greater or equal to 0
             intNumMoves -= amount;
             setNumTurnsLabel(intNumMoves);
-            toggleMoveButtonState(true);
+            toggleMoveCountButtonState(true);
             if (intNumMoves == 0) {
-                toggleMoveButtonState(false);
+                toggleMoveCountButtonState(false);
             }
             return true;
         }
         else {
             intNumMoves = 0; //Setting it to 0 in case intNumMoves is somehow < 0
             setNumTurnsLabel(intNumMoves);
-            toggleMoveButtonState(false);
+            toggleMoveCountButtonState(false);
             return false;
         }
     }

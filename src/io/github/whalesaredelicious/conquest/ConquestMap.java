@@ -25,16 +25,16 @@ import javax.swing.JOptionPane;
 
 public class ConquestMap extends JFrame {
     private static int intMoveAmount = 50;
-    private static Point[][] pointLocation = new Point[15][10];
+    private static Point[][] pointLocation = new Point[18][11];
     
-    public static int[][] intUnit1_1Coords = new int[15][10];
-    public static int[][] intUnit1_2Coords = new int[15][10];
-    public static int[][] intUnit1_3Coords = new int[15][10];
-    public static int[][] intUnit2_1Coords = new int[15][10];
-    public static int[][] intUnit2_2Coords = new int[15][10];
-    public static int[][] intUnit2_3Coords = new int[15][10];
+    public static int[] intUnit1_1Coords = new int[2];
+    public static int[] intUnit1_2Coords = new int[2];
+    public static int[] intUnit1_3Coords = new int[2];
+    public static int[] intUnit2_1Coords = new int[2];
+    public static int[] intUnit2_2Coords = new int[2];
+    public static int[] intUnit2_3Coords = new int[2];
     
-    public static boolean[][] booleanGridOccupied = new boolean[15][10];
+    public static boolean[][] booleanGridOccupied = new boolean[18][11];
     
     /**
      * Creates new form ConquestMap
@@ -45,6 +45,7 @@ public class ConquestMap extends JFrame {
         initLocations();
         setSize(905, 600);
         setResizable(false);
+        setLocationRelativeTo(null);
     }
 
     /**
@@ -131,15 +132,17 @@ public class ConquestMap extends JFrame {
             }
         });
     }
-    public void setUnitLocation() {
-        lblUnit1_1.setLocation(0, 0);
-        lblUnit1_2.setLocation(50, 0);
-        lblUnit1_3.setLocation(0, 50);
-        
-        lblUnit2_1.setLocation(850, 500);
-        lblUnit2_2.setLocation(800, 500);
-        lblUnit2_3.setLocation(850, 450);
-    }
+    /* //Potentially obsolete code
+        public void setUnitLocation() {
+            lblUnit1_1.setLocation(0, 0);
+            lblUnit1_2.setLocation(50, 0);
+            lblUnit1_3.setLocation(0, 50);
+
+            lblUnit2_1.setLocation(850, 500);
+            lblUnit2_2.setLocation(800, 500);
+            lblUnit2_3.setLocation(850, 450);
+        }
+    */
     public static void moveTest() {
         lblUnit1_1.setLocation(pointLocation[6][9]);
     }
@@ -159,6 +162,7 @@ public class ConquestMap extends JFrame {
                 }
             }
         }
+        checkPossibleMoveDirections();
     }
     private static void moveUnit(int unitSelected, int moveDirection) {
         switch (unitSelected) {
@@ -209,29 +213,54 @@ public class ConquestMap extends JFrame {
         }
         return pointNewLocation;
     }
-    private void initLocations() {
+    public void initLocations() {
         initPointLocation();
-        initUnitCoords();
         initGridOccupied();
+        initUnitLocations();
+        
     }
     private void initPointLocation() {
         //Make possible location points
-        //Grid is 15 x 10.
-        for (int x = 0; x < pointLocation.length; x++) {
-            for (int y = 0; y < pointLocation[y].length; y++) {
-                pointLocation[x][y] = new Point();
-                log(Integer.toString(x) + ", " + Integer.toString(y));
-                pointLocation[x][y].x = x * 60;
-                pointLocation[x][y].y = y * 60;
-                
+        //Grid is 18 gridX 11.
+        for (int gridX = 0; gridX < pointLocation.length; gridX++) {
+            for (int gridY = 0; gridY < pointLocation[gridY].length; gridY++) {
+                pointLocation[gridX][gridY] = new Point();
+                log(Integer.toString(gridX) + ", " + Integer.toString(gridY));
+                pointLocation[gridX][gridY].x = gridX * 60;
+                pointLocation[gridX][gridY].y = gridY * 60;
             }
         }
     }
-    private void initUnitCoords() {
+    private static void checkPossibleMoveDirections() {
+        
+    }
+    private void initUnitLocations() {
+        int x = 0, y = 1; //These represent the coordinate axes
+        intUnit1_1Coords[x] = 0;
+        intUnit1_1Coords[y] = 0;
+        
+        intUnit1_2Coords[x] = 1;
+        intUnit1_2Coords[y] = 0;
+        
+        intUnit1_3Coords[x] = 0;
+        intUnit1_3Coords[y] = 1;
+        
+        intUnit2_1Coords[x] = 17;
+        intUnit2_1Coords[y] = 10;
+        
+        intUnit2_2Coords[x] = 16;
+        intUnit2_2Coords[y] = 10;
+        
+        intUnit2_3Coords[x] = 17;
+        intUnit2_3Coords[y] = 9;
         
     }
     private void initGridOccupied() {
-        
+        for (int gridX = 0; gridX < booleanGridOccupied.length; gridX++) {
+            for (int gridY = 0; gridY < booleanGridOccupied[gridX].length; gridY++) {
+                booleanGridOccupied[gridX][gridY] = false;
+            }
+        }
     }
     private static void log(String message) {
         System.out.println(message);
