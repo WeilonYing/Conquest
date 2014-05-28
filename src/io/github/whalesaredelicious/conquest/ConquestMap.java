@@ -188,6 +188,7 @@ public class ConquestMap extends JFrame {
                 log("Invalid unit selection");
                 break;
         }
+        setGridOccupied(unitSelected, moveDirection, 1);
     }
     private static Point newLocation(JLabel unit, int moveDirection) {
         //1 = up, 2 = right, 3 = down, 4 = left
@@ -215,7 +216,7 @@ public class ConquestMap extends JFrame {
     }
     public void initLocations() {
         initPointLocation();
-        initGridOccupied();
+        resetGridOccupied();
         initUnitLocations();
         
     }
@@ -226,8 +227,8 @@ public class ConquestMap extends JFrame {
             for (int gridY = 0; gridY < pointLocation[gridY].length; gridY++) {
                 pointLocation[gridX][gridY] = new Point();
                 log(Integer.toString(gridX) + ", " + Integer.toString(gridY));
-                pointLocation[gridX][gridY].x = gridX * 60;
-                pointLocation[gridX][gridY].y = gridY * 60;
+                pointLocation[gridX][gridY].x = gridX * intMoveAmount;
+                pointLocation[gridX][gridY].y = gridY * intMoveAmount;
             }
         }
     }
@@ -254,12 +255,60 @@ public class ConquestMap extends JFrame {
         intUnit2_3Coords[x] = 17;
         intUnit2_3Coords[y] = 9;
         
+        lblUnit1_1.setLocation(pointLocation[intUnit1_1Coords[x]][intUnit1_1Coords[y]]);
+        lblUnit1_2.setLocation(pointLocation[intUnit1_2Coords[x]][intUnit1_2Coords[y]]);
+        lblUnit1_3.setLocation(pointLocation[intUnit1_3Coords[x]][intUnit1_3Coords[y]]);
+        lblUnit2_1.setLocation(pointLocation[intUnit2_1Coords[x]][intUnit2_1Coords[y]]);
+        lblUnit2_2.setLocation(pointLocation[intUnit2_2Coords[x]][intUnit2_2Coords[y]]);
+        lblUnit2_3.setLocation(pointLocation[intUnit2_3Coords[x]][intUnit2_3Coords[y]]);
     }
-    private void initGridOccupied() {
+    private void resetGridOccupied() {
         for (int gridX = 0; gridX < booleanGridOccupied.length; gridX++) {
             for (int gridY = 0; gridY < booleanGridOccupied[gridX].length; gridY++) {
                 booleanGridOccupied[gridX][gridY] = false;
             }
+        }
+    }
+    private static void setGridOccupied(int unitSelected, int moveDirection, int moveAmount) {
+        //1 = up, 2 = right, 3 = down, 4 = left
+        int x = 0, y = 1; //Coordinate axes
+        switch (unitSelected) {
+            case 0:
+                switch (moveDirection) {
+                    case 1:
+                        intUnit1_1Coords[y] -= moveAmount;
+                        break;
+                    case 2:
+                        intUnit1_1Coords[x] += moveAmount;
+                        break;
+                    case 3:
+                        intUnit1_1Coords[y] += moveAmount;
+                        break;
+                    case 4:
+                        intUnit1_1Coords[x] -= moveAmount;
+                        break;
+                }
+                booleanGridOccupied[intUnit1_1Coords[x]][intUnit1_1Coords[y]] = true;
+                log("successful setting at " + intUnit1_1Coords[x] + ", " + intUnit1_1Coords[y]);
+                break;
+            case 1:
+                lblUnit1_2.setLocation(newLocation(lblUnit1_2, moveDirection));
+                break;
+            case 2:
+                lblUnit1_3.setLocation(newLocation(lblUnit1_3, moveDirection));
+                break;
+            case 3:
+                lblUnit2_1.setLocation(newLocation(lblUnit2_1, moveDirection));
+                break;
+            case 4:
+                lblUnit2_2.setLocation(newLocation(lblUnit2_2, moveDirection));
+                break;
+            case 5:
+                lblUnit2_3.setLocation(newLocation(lblUnit2_3, moveDirection));
+                break;
+            default:
+                log("Invalid unit selection");
+                break;
         }
     }
     private static void log(String message) {

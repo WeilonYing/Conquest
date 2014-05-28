@@ -78,10 +78,7 @@ public class Conquest extends JFrame {
     private JLabel lblPlayer2 = new JLabel(stringPlayer2, JLabel.CENTER);
     private JLabel lblVs = new JLabel("vs.", JLabel.CENTER);
     
-    /**
-     * Constructor method.
-     * Creates new form Conquest
-     */
+    //Constructor method
     public Conquest() {
         super("Conquest");
         
@@ -129,11 +126,6 @@ public class Conquest extends JFrame {
                 conquestmap.initLocations();
             }
         });
-    }
-    
-    //Log method - not necessary, but makes typing out code for printing to console easier.
-    public static void log(String message) {
-        System.out.println(message);
     }
     
     //Initialisation methods - setting up GUI elements
@@ -308,108 +300,23 @@ public class Conquest extends JFrame {
         
     }
     
-    private void selectUnit(int unitNumber) {
-        //Select a unit.
-        if (booleanIsPlayer1Turn) {
-            for (int i = 0; i < booleanPlayer1UnitSelected.length; i++) {
-                booleanPlayer1UnitSelected[i] = false;
+    //Unit management methods
+    private boolean processMove(int amount) { //Checks if player has enough points to execute an action and subtracts the appropriate amount.
+        if ((intNumMoves - amount) >= 0) { //Checks if amount to remove will still be greater or equal to 0
+            intNumMoves -= amount;
+            setNumTurnsLabel(intNumMoves);
+            toggleMoveCountButtonState(true);
+            if (intNumMoves == 0) {
+                toggleMoveCountButtonState(false);
             }
-            booleanPlayer1UnitSelected[unitNumber] = true;
-            booleanUnitSelected = true;
+            return true;
         }
         else {
-            for (int i = 0; i < booleanPlayer2UnitSelected.length; i++) {
-                booleanPlayer2UnitSelected[i] = false;
-            }
-            booleanPlayer2UnitSelected[unitNumber] = true;
-            booleanUnitSelected = true;
+            intNumMoves = 0; //Setting it to 0 in case intNumMoves is somehow < 0
+            setNumTurnsLabel(intNumMoves);
+            toggleMoveCountButtonState(false);
+            return false;
         }
-    }
-    
-    //ActionEvent Responders - event driven methods for responding to button presses
-    private void btnMoveUpPressed(ActionEvent evt) {
-        prepareMove(1);
-    }
-    private void btnMoveDownPressed(ActionEvent evt) {
-        prepareMove(3);
-    }
-    private void btnMoveLeftPressed(ActionEvent evt) {
-        prepareMove(4);
-    }
-    private void btnMoveRightPressed(ActionEvent evt) {
-        prepareMove(2);
-    }
-    private void btnSelectUnit1Pressed(ActionEvent evt) {
-        selectUnit(0);
-    }
-    private void btnSelectUnit2Pressed(ActionEvent evt) {
-        selectUnit(1);
-    }
-    private void btnSelectUnit3Pressed(ActionEvent evt) {
-        selectUnit(2);
-    }
-    private void btnUpgradeUnit1Pressed(ActionEvent evt) {
-        prepareUpgrade(1, 1);
-    }
-    private void btnUpgradeUnit2Pressed(ActionEvent evt) {
-        prepareUpgrade(2, 1);
-    }
-    private void btnUpgradeUnit3Pressed(ActionEvent evt) {
-        //Do stuff here
-    }
-    private void btnEndTurnPressed(ActionEvent evt) {
-        changeTurn();
-    }
-    private void btnRollDicePressed(ActionEvent evt) {
-        rollDice();
-    }
-    private void toggleMoveCountButtonState(boolean state) {
-        //Greys out or re-enables the move buttons depending on its set parameter.
-        btnMoveUp.setEnabled(state);
-        btnMoveDown.setEnabled(state);
-        btnMoveLeft.setEnabled(state);
-        btnMoveRight.setEnabled(state);
-        
-        btnUpgradeUnit1.setEnabled(state);
-        btnUpgradeUnit2.setEnabled(state);
-        btnUpgradeUnit3.setEnabled(state);
-    }
-    private void changeTurn() {
-        //Switch turn
-        if (booleanIsPlayer1Turn) {
-            booleanIsPlayer1Turn = false;
-            stringPlayerTurn = stringPlayer2;
-        }
-        else {
-            booleanIsPlayer1Turn = true;
-            stringPlayerTurn = stringPlayer1;
-        }
-        lblWhoseTurn.setText("Turn: " + stringPlayerTurn);
-        
-        //Reset selected units
-        for (int i = 0; i < booleanPlayer1UnitSelected.length; i++) {
-            booleanPlayer1UnitSelected[i] = false;
-        }
-        for (int i = 0; i < booleanPlayer2UnitSelected.length; i++) {
-            booleanPlayer2UnitSelected[i] = false;
-        }
-        booleanUnitSelected = false;
-        intNumMoves = 0;
-        setNumTurnsLabel(intNumMoves);
-        setLblUnitPower();
-        toggleMoveCountButtonState(false);
-        btnRollDice.setEnabled(true);
-    }
-    private void rollDice() { //Generate a random integer between 1-6
-        intNumMoves = (RandomIntGenerator(1, 6));
-        intNumMoves = 9001;
-        setNumTurnsLabel(intNumMoves);
-        
-        //Re-enable the buttons
-        toggleMoveCountButtonState(true);
-        
-        //Disable the Roll Dice button after use.
-        btnRollDice.setEnabled(false);
     }
     private void prepareMove(int moveDirection) { //Ensures a unit is selected before executing.
         if (booleanUnitSelected) {
@@ -418,7 +325,7 @@ public class Conquest extends JFrame {
             }
         }
     }
-    private void prepareUpgrade(int unitNumber, int upgradeAmount) { //Makes the relevant checks before processing the unit upgrade.
+    private void upgradeUnit(int unitNumber, int upgradeAmount) { //Makes the relevant checks, then processes the unit upgrade.
         //If invalid unit selected, boolean flag will prevent a move being subtracted from the player.
         boolean booleanUpgradeSuccessful = false;
         if (booleanIsPlayer1Turn) {
@@ -479,6 +386,11 @@ public class Conquest extends JFrame {
         if (intUnit2_2Power > 9001) {intUnit2_2Power = 9001;}
         if (intUnit2_3Power > 9001) {intUnit2_3Power = 9001;}
     }
+    
+    //GUI management methods
+    private void setNumTurnsLabel (int num) {
+        lblNumMoves.setText("No. of moves left: " + Integer.toString(num));
+    }
     private void setLblUnitPower() {
         if (booleanIsPlayer1Turn) {
             lblUnit1Power.setText(Integer.toString(intUnit1_1Power));
@@ -491,30 +403,121 @@ public class Conquest extends JFrame {
             lblUnit3Power.setText(Integer.toString(intUnit2_3Power));
         }
     }
-    private boolean processMove(int amount) { //Checks if player has enough points to execute an action and subtracts the appropriate amount.
-        if ((intNumMoves - amount) >= 0) { //Checks if amount to remove will still be greater or equal to 0
-            intNumMoves -= amount;
-            setNumTurnsLabel(intNumMoves);
-            toggleMoveCountButtonState(true);
-            if (intNumMoves == 0) {
-                toggleMoveCountButtonState(false);
+    private void toggleMoveCountButtonState(boolean state) {
+        //Greys out or re-enables the move buttons depending on its set parameter.
+        btnMoveUp.setEnabled(state);
+        btnMoveDown.setEnabled(state);
+        btnMoveLeft.setEnabled(state);
+        btnMoveRight.setEnabled(state);
+        
+        btnUpgradeUnit1.setEnabled(state);
+        btnUpgradeUnit2.setEnabled(state);
+        btnUpgradeUnit3.setEnabled(state);
+    }
+    
+    //Player management methods
+    private void selectUnit(int unitNumber) {
+        //Select a unit.
+        if (booleanIsPlayer1Turn) {
+            for (int i = 0; i < booleanPlayer1UnitSelected.length; i++) {
+                booleanPlayer1UnitSelected[i] = false;
             }
-            return true;
+            booleanPlayer1UnitSelected[unitNumber] = true;
+            booleanUnitSelected = true;
         }
         else {
-            intNumMoves = 0; //Setting it to 0 in case intNumMoves is somehow < 0
-            setNumTurnsLabel(intNumMoves);
-            toggleMoveCountButtonState(false);
-            return false;
+            for (int i = 0; i < booleanPlayer2UnitSelected.length; i++) {
+                booleanPlayer2UnitSelected[i] = false;
+            }
+            booleanPlayer2UnitSelected[unitNumber] = true;
+            booleanUnitSelected = true;
         }
+    }
+    private void changeTurn() {
+        //Switch turn
+        if (booleanIsPlayer1Turn) {
+            booleanIsPlayer1Turn = false;
+            stringPlayerTurn = stringPlayer2;
+        }
+        else {
+            booleanIsPlayer1Turn = true;
+            stringPlayerTurn = stringPlayer1;
+        }
+        lblWhoseTurn.setText("Turn: " + stringPlayerTurn);
+        
+        //Reset selected units
+        for (int i = 0; i < booleanPlayer1UnitSelected.length; i++) {
+            booleanPlayer1UnitSelected[i] = false;
+        }
+        for (int i = 0; i < booleanPlayer2UnitSelected.length; i++) {
+            booleanPlayer2UnitSelected[i] = false;
+        }
+        booleanUnitSelected = false;
+        intNumMoves = 0;
+        setNumTurnsLabel(intNumMoves);
+        setLblUnitPower();
+        toggleMoveCountButtonState(false);
+        btnRollDice.setEnabled(true);
+    }
+    private void rollDice() { //Generate a random integer between 1-6
+        intNumMoves = (RandomIntGenerator(1, 6));
+        intNumMoves = 9001;
+        setNumTurnsLabel(intNumMoves);
+        
+        //Re-enable the buttons
+        toggleMoveCountButtonState(true);
+        
+        //Disable the Roll Dice button after use.
+        btnRollDice.setEnabled(false);
+    }
+    
+    //General purpose methods
+    private static void log(String message) { //Log method - not necessary, but makes typing out code for printing to console easier.
+        System.out.println(message);
     }
     private int RandomIntGenerator(int minvalue, int maxvalue) { //Generates a random integer between a set minimum and maximum value
         int number = (minvalue + (int)(Math.random() * ((maxvalue - minvalue) + 1)));
         return number;
     }
-    private void setNumTurnsLabel (int num) {
-        lblNumMoves.setText("No. of moves left: " + Integer.toString(num));
+    
+    //ActionEvent Responders - event driven methods for responding to button presses
+    private void btnMoveUpPressed(ActionEvent evt) {
+        prepareMove(1);
     }
+    private void btnMoveDownPressed(ActionEvent evt) {
+        prepareMove(3);
+    }
+    private void btnMoveLeftPressed(ActionEvent evt) {
+        prepareMove(4);
+    }
+    private void btnMoveRightPressed(ActionEvent evt) {
+        prepareMove(2);
+    }
+    private void btnSelectUnit1Pressed(ActionEvent evt) {
+        selectUnit(0);
+    }
+    private void btnSelectUnit2Pressed(ActionEvent evt) {
+        selectUnit(1);
+    }
+    private void btnSelectUnit3Pressed(ActionEvent evt) {
+        selectUnit(2);
+    }
+    private void btnUpgradeUnit1Pressed(ActionEvent evt) {
+        upgradeUnit(1, 1);
+    }
+    private void btnUpgradeUnit2Pressed(ActionEvent evt) {
+        upgradeUnit(2, 1);
+    }
+    private void btnUpgradeUnit3Pressed(ActionEvent evt) {
+        //Do stuff here
+    }
+    private void btnEndTurnPressed(ActionEvent evt) {
+        changeTurn();
+    }
+    private void btnRollDicePressed(ActionEvent evt) {
+        rollDice();
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
