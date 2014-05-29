@@ -51,32 +51,32 @@ public class Conquest extends JFrame {
     private boolean booleanUnitSelected = false; //Used to prevent decrementing a move when unit is not selected.
     
     //Declare control buttons
-    private JButton btnMoveUp = new JButton("Up");
-    private JButton btnMoveDown = new JButton("Down");
-    private JButton btnMoveLeft = new JButton("Left");
-    private JButton btnMoveRight = new JButton("Right");
+    public final JButton btnMoveUp = new JButton("Up");
+    public final JButton btnMoveDown = new JButton("Down");
+    public final JButton btnMoveLeft = new JButton("Left");
+    public final JButton btnMoveRight = new JButton("Right");
     
-    private JButton btnSelectUnit1 = new JButton("Unit 1");
-    private JButton btnSelectUnit2 = new JButton("Unit 2");
-    private JButton btnSelectUnit3 = new JButton("Unit 3");
+    private final JButton btnSelectUnit1 = new JButton("Unit 1");
+    private final JButton btnSelectUnit2 = new JButton("Unit 2");
+    private final JButton btnSelectUnit3 = new JButton("Unit 3");
     
-    private JButton btnUpgradeUnit1 = new JButton("+");
-    private JButton btnUpgradeUnit2 = new JButton("+");
-    private JButton btnUpgradeUnit3 = new JButton("+");
+    private final JButton btnUpgradeUnit1 = new JButton("+");
+    private final JButton btnUpgradeUnit2 = new JButton("+");
+    private final JButton btnUpgradeUnit3 = new JButton("+");
     
-    private JButton btnRollDice = new JButton("Roll Dice");
-    private JButton btnEndTurn = new JButton("End Turn");
+    private final JButton btnRollDice = new JButton("Roll Dice");
+    private final JButton btnEndTurn = new JButton("End Turn");
     
     //Declare labels
-    private JLabel lblUnit1Power = new JLabel("0");
-    private JLabel lblUnit2Power = new JLabel("0");
-    private JLabel lblUnit3Power = new JLabel("0");
+    private final JLabel lblUnit1Power = new JLabel("0");
+    private final JLabel lblUnit2Power = new JLabel("0");
+    private final JLabel lblUnit3Power = new JLabel("0");
     
-    private JLabel lblWhoseTurn = new JLabel("Turn: " + stringPlayerTurn);
-    private JLabel lblNumMoves = new JLabel("No. of moves left: " + Integer.toString(intNumMoves));
-    private JLabel lblPlayer1 = new JLabel(stringPlayer1, JLabel.CENTER);
-    private JLabel lblPlayer2 = new JLabel(stringPlayer2, JLabel.CENTER);
-    private JLabel lblVs = new JLabel("vs.", JLabel.CENTER);
+    private final JLabel lblWhoseTurn = new JLabel("Turn: " + stringPlayerTurn);
+    private final JLabel lblNumMoves = new JLabel("No. of moves left: " + Integer.toString(intNumMoves));
+    private final JLabel lblPlayer1 = new JLabel(stringPlayer1, JLabel.CENTER);
+    private final JLabel lblPlayer2 = new JLabel(stringPlayer2, JLabel.CENTER);
+    private final JLabel lblVs = new JLabel("vs.", JLabel.CENTER);
     
     //Constructor method
     public Conquest() {
@@ -103,7 +103,7 @@ public class Conquest extends JFrame {
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
+                if ("Windows".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }
@@ -248,7 +248,7 @@ public class Conquest extends JFrame {
 
         btnMoveUp.setBounds((boundaryX - 160), (boundaryY - 240), 60, 60);
         btnMoveDown.setBounds((boundaryX - 160), (boundaryY - 140), 60, 60);
-        btnMoveLeft.setBounds((boundaryX - 225), (boundaryY - 190), 60, 60);
+        btnMoveLeft.setBounds((boundaryX - 220), (boundaryY - 190), 60, 60);
         btnMoveRight.setBounds((boundaryX - 100), (boundaryY - 190), 60, 60);
 
         btnSelectUnit1.setBounds((boundaryX - 450), (boundaryY - 220), 100, 40);
@@ -322,6 +322,7 @@ public class Conquest extends JFrame {
         if (booleanUnitSelected) {
             if (processMove(1)) {
                 ConquestMap.move(moveDirection);
+                checkPossibleMoveDirections();
             }
         }
     }
@@ -414,7 +415,155 @@ public class Conquest extends JFrame {
         btnUpgradeUnit2.setEnabled(state);
         btnUpgradeUnit3.setEnabled(state);
     }
-    
+    private void checkPossibleMoveDirections() {
+        //1 = up, 2 = right, 3 = down, 4 = left
+        if (intNumMoves > 0) {
+            toggleMoveCountButtonState(true);
+        }
+        int unitSelected = 0;
+        
+        if (booleanIsPlayer1Turn) {
+            for (int i = 0; i < booleanPlayer1UnitSelected.length; i++) {
+                if (Conquest.booleanPlayer1UnitSelected[i]) {
+                    unitSelected = i;
+                    break;
+                }
+            }
+        }
+        else {
+            for (int i = 0; i < booleanPlayer2UnitSelected.length; i++) {
+                if (booleanPlayer2UnitSelected[i]) {
+                    unitSelected = i + 3;
+                    break;
+                }
+            }
+        }
+        
+        int x = 0, y = 1; //Coordinate axes
+        int gridX = 0, gridY = 0;
+        switch (unitSelected) {
+            case 0:
+                gridX = ConquestMap.intUnit1_1Coords[x];
+                gridY = ConquestMap.intUnit1_1Coords[y];
+                switch (gridX) {
+                    case 0:
+                        btnMoveLeft.setEnabled(false);
+                        break;
+                    case 17:
+                        btnMoveRight.setEnabled(false);
+                        break;
+                }
+                switch (gridY) {
+                    case 0:
+                        btnMoveUp.setEnabled(false);
+                        break;
+                    case 10:
+                        btnMoveDown.setEnabled(false);
+                        break;
+                }
+                break;
+            case 1:
+                gridX = ConquestMap.intUnit1_2Coords[x];
+                gridY = ConquestMap.intUnit1_2Coords[y];
+                switch (gridX) {
+                    case 0:
+                        btnMoveLeft.setEnabled(false);
+                        break;
+                    case 17:
+                        btnMoveRight.setEnabled(false);
+                        break;
+                }
+                switch (gridY) {
+                    case 0:
+                        btnMoveUp.setEnabled(false);
+                        break;
+                    case 10:
+                        btnMoveDown.setEnabled(false);
+                        break;
+                }
+                break;
+            case 2:
+                gridX = ConquestMap.intUnit1_3Coords[x];
+                gridY = ConquestMap.intUnit1_3Coords[y];
+                switch (gridX) {
+                    case 0:
+                        btnMoveLeft.setEnabled(false);
+                        break;
+                    case 17:
+                        btnMoveRight.setEnabled(false);
+                        break;
+                }
+                switch (gridY) {
+                    case 0:
+                        btnMoveUp.setEnabled(false);
+                        break;
+                    case 10:
+                        btnMoveDown.setEnabled(false);
+                        break;
+                }
+                break;
+            case 3:
+                gridX = ConquestMap.intUnit2_1Coords[x];
+                gridY = ConquestMap.intUnit2_1Coords[y];
+                switch (gridX) {
+                    case 0:
+                        btnMoveLeft.setEnabled(false);
+                        break;
+                    case 17:
+                        btnMoveRight.setEnabled(false);
+                        break;
+                }
+                switch (gridY) {
+                    case 0:
+                        btnMoveUp.setEnabled(false);
+                        break;
+                    case 10:
+                        btnMoveDown.setEnabled(false);
+                        break;
+                }
+                break;
+            case 4:
+                gridX = ConquestMap.intUnit2_2Coords[x];
+                gridY = ConquestMap.intUnit2_2Coords[y];
+                switch (gridX) {
+                    case 0:
+                        btnMoveLeft.setEnabled(false);
+                        break;
+                    case 17:
+                        btnMoveRight.setEnabled(false);
+                        break;
+                }
+                switch (gridY) {
+                    case 0:
+                        btnMoveUp.setEnabled(false);
+                        break;
+                    case 10:
+                        btnMoveDown.setEnabled(false);
+                        break;
+                }
+                break;
+            case 5:
+                gridX = ConquestMap.intUnit2_3Coords[x];
+                gridY = ConquestMap.intUnit2_3Coords[y];
+                switch (gridX) {
+                    case 0:
+                        btnMoveLeft.setEnabled(false);
+                        break;
+                    case 17:
+                        btnMoveRight.setEnabled(false);
+                        break;
+                }
+                switch (gridY) {
+                    case 0:
+                        btnMoveUp.setEnabled(false);
+                        break;
+                    case 10:
+                        btnMoveDown.setEnabled(false);
+                        break;
+                }
+                break;
+        }
+    }
     //Player management methods
     private void selectUnit(int unitNumber) {
         //Select a unit.
@@ -423,6 +572,7 @@ public class Conquest extends JFrame {
                 booleanPlayer1UnitSelected[i] = false;
             }
             booleanPlayer1UnitSelected[unitNumber] = true;
+            checkPossibleMoveDirections();
             booleanUnitSelected = true;
         }
         else {
@@ -430,6 +580,7 @@ public class Conquest extends JFrame {
                 booleanPlayer2UnitSelected[i] = false;
             }
             booleanPlayer2UnitSelected[unitNumber] = true;
+            checkPossibleMoveDirections();
             booleanUnitSelected = true;
         }
     }
@@ -509,7 +660,7 @@ public class Conquest extends JFrame {
         upgradeUnit(2, 1);
     }
     private void btnUpgradeUnit3Pressed(ActionEvent evt) {
-        //Do stuff here
+        upgradeUnit(3, 1);
     }
     private void btnEndTurnPressed(ActionEvent evt) {
         changeTurn();
@@ -518,6 +669,7 @@ public class Conquest extends JFrame {
         rollDice();
     }
     
+    //Auto-generated code below
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -542,7 +694,7 @@ public class Conquest extends JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-    // Auto-generated code below.
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
 }
