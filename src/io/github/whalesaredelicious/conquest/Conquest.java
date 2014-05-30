@@ -73,6 +73,7 @@ public class Conquest extends JFrame {
     private final JLabel lblUnit3Power = new JLabel("0");
     
     private final JLabel lblWhoseTurn = new JLabel("Turn: " + stringPlayerTurn);
+    private final JLabel lblCurrentSelectedUnit = new JLabel("Current selected unit: None");
     private final JLabel lblNumMoves = new JLabel("No. of moves left: " + Integer.toString(intNumMoves));
     private final JLabel lblPlayer1 = new JLabel(stringPlayer1, JLabel.CENTER);
     private final JLabel lblPlayer2 = new JLabel(stringPlayer2, JLabel.CENTER);
@@ -236,6 +237,8 @@ public class Conquest extends JFrame {
         
         add(lblWhoseTurn);
         add(lblNumMoves);
+        add(lblCurrentSelectedUnit);
+        
         add(lblPlayer1);
         add(lblPlayer2);
         add(lblVs);
@@ -255,9 +258,9 @@ public class Conquest extends JFrame {
         btnSelectUnit2.setBounds((boundaryX - 450), (boundaryY - 170), 100, 40);
         btnSelectUnit3.setBounds((boundaryX - 450), (boundaryY - 120), 100, 40);
         
-        btnUpgradeUnit1.setBounds((boundaryX - 350), (boundaryY - 220), 40, 40);
-        btnUpgradeUnit2.setBounds((boundaryX - 350), (boundaryY - 170), 40, 40);
-        btnUpgradeUnit3.setBounds((boundaryX - 350), (boundaryY - 120), 40, 40);
+        btnUpgradeUnit1.setBounds((boundaryX - 350), (boundaryY - 220), 50, 40);
+        btnUpgradeUnit2.setBounds((boundaryX - 350), (boundaryY - 170), 50, 40);
+        btnUpgradeUnit3.setBounds((boundaryX - 350), (boundaryY - 120), 50, 40);
         
         btnEndTurn.setBounds((boundaryX - 150), (boundaryY - 20), 100, 40);
         btnRollDice.setBounds((boundaryX - 150), (boundaryY - 60), 100, 40);
@@ -282,8 +285,9 @@ public class Conquest extends JFrame {
         lblUnit2Power.setBounds(boundaryX - 475, boundaryY - 155, 30, 10);
         lblUnit3Power.setBounds(boundaryX - 475, boundaryY - 105, 30, 10);
         
-        lblWhoseTurn.setBounds(boundaryX - 475, boundaryY - 50, 200, 30);
-        lblNumMoves.setBounds(boundaryX - 475, boundaryY - 20, 200, 30);
+        lblWhoseTurn.setBounds(boundaryX - 475, boundaryY - 70, 200, 30);
+        lblNumMoves.setBounds(boundaryX - 475, boundaryY - 40, 200, 30);
+        lblCurrentSelectedUnit.setBounds((boundaryX - 475), (boundaryY - 10), 200, 30);
         
         lblPlayer1.setBounds(boundaryX - 500, boundaryY - 300, 150, 30);
         lblPlayer2.setBounds(boundaryX - 200, boundaryY - 300, 150, 30);
@@ -293,6 +297,7 @@ public class Conquest extends JFrame {
         Font fontStandard = new Font("sans-serif", Font.PLAIN, 16);
         lblWhoseTurn.setFont(fontStandard);
         lblNumMoves.setFont(fontStandard);
+        lblCurrentSelectedUnit.setFont(fontStandard);
         
         lblPlayer1.setFont(fontStandard);
         lblPlayer2.setFont(fontStandard);
@@ -368,10 +373,10 @@ public class Conquest extends JFrame {
         }
         limitUnitPower();
         setLblUnitPower();
-        
         if (booleanUpgradeSuccessful) {
             processMove(upgradeAmount);
         }
+        checkPossibleMoveDirections();
     }
     private void limitUnitPower() {
         /**
@@ -417,11 +422,14 @@ public class Conquest extends JFrame {
     }
     private void checkPossibleMoveDirections() {
         //1 = up, 2 = right, 3 = down, 4 = left
+        //Ensures buttons aren't set enabled if user doesn't have any moves left anyway.
         if (intNumMoves > 0) {
             toggleMoveCountButtonState(true);
         }
+        //Initialise unitSelected variable.
         int unitSelected = 0;
         
+        //Find the current selected unit.
         if (booleanIsPlayer1Turn) {
             for (int i = 0; i < booleanPlayer1UnitSelected.length; i++) {
                 if (Conquest.booleanPlayer1UnitSelected[i]) {
@@ -439,6 +447,7 @@ public class Conquest extends JFrame {
             }
         }
         
+        //Switch statement finds the appropriate unit and its location on the grid.
         int x = 0, y = 1; //Coordinate axes
         int gridX = 0, gridY = 0;
         switch (unitSelected) {
@@ -563,10 +572,25 @@ public class Conquest extends JFrame {
                 }
                 break;
         }
+        boolean[] booleanButtonGreyOut = new boolean[4];
+        System.out.println("Unit Selected: " + unitSelected);
+        booleanButtonGreyOut = ConquestMap.checkGridOccupied(unitSelected);
+        if (booleanButtonGreyOut[0]) {
+            btnMoveUp.setEnabled(false);
+        }
+        if (booleanButtonGreyOut[1]) {
+            btnMoveRight.setEnabled(false);
+        }
+        if (booleanButtonGreyOut[2]) {
+            btnMoveDown.setEnabled(false);
+        }
+        if (booleanButtonGreyOut[3]) {
+            btnMoveLeft.setEnabled(false);
+        }
     }
     //Player management methods
     private void selectUnit(int unitNumber) {
-        //Select a unit.
+        //Select a unit by setting the appropriate array index to true and all others false.
         if (booleanIsPlayer1Turn) {
             for (int i = 0; i < booleanPlayer1UnitSelected.length; i++) {
                 booleanPlayer1UnitSelected[i] = false;
@@ -583,6 +607,7 @@ public class Conquest extends JFrame {
             checkPossibleMoveDirections();
             booleanUnitSelected = true;
         }
+        lblCurrentSelectedUnit.setText("Current selected unit: " + Integer.toString(unitNumber + 1));
     }
     private void changeTurn() {
         //Switch turn
@@ -607,6 +632,7 @@ public class Conquest extends JFrame {
         intNumMoves = 0;
         setNumTurnsLabel(intNumMoves);
         setLblUnitPower();
+        lblCurrentSelectedUnit.setText("Current selected unit: None");
         toggleMoveCountButtonState(false);
         btnRollDice.setEnabled(true);
     }
@@ -620,6 +646,9 @@ public class Conquest extends JFrame {
         
         //Disable the Roll Dice button after use.
         btnRollDice.setEnabled(false);
+        
+        //Check possible move directions if unit is already selected.
+        checkPossibleMoveDirections();
     }
     
     //General purpose methods

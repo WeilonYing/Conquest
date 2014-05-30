@@ -23,15 +23,12 @@
 package io.github.whalesaredelicious.conquest;
 
 import java.awt.Point;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
-public class ConquestMap extends JFrame {
-    private static int intMoveAmount = 50;
-    private static Point[][] pointLocation = new Point[18][11]; //Point data type defines screen location.
+public final class ConquestMap extends JFrame {
+    private static final int intMoveAmount = 50;
+    private static final Point[][] pointLocation = new Point[18][11]; //Point data type defines screen location.
     
     public static int[] intUnit1_1Coords = new int[2];
     public static int[] intUnit1_2Coords = new int[2];
@@ -147,7 +144,7 @@ public class ConquestMap extends JFrame {
         for (int gridX = 0; gridX < pointLocation.length; gridX++) {
             for (int gridY = 0; gridY < pointLocation[gridY].length; gridY++) {
                 pointLocation[gridX][gridY] = new Point();
-                log(Integer.toString(gridX) + ", " + Integer.toString(gridY));
+                //log(Integer.toString(gridX) + ", " + Integer.toString(gridY));
                 pointLocation[gridX][gridY].x = gridX * intMoveAmount;
                 pointLocation[gridX][gridY].y = gridY * intMoveAmount;
             }
@@ -155,23 +152,23 @@ public class ConquestMap extends JFrame {
     }
     private void initUnitLocations() {
         int x = 0, y = 1; //These represent the coordinate axes
-        intUnit1_1Coords[x] = 0;
-        intUnit1_1Coords[y] = 0;
+        intUnit1_1Coords[x] = 1;
+        intUnit1_1Coords[y] = 1;
         
-        intUnit1_2Coords[x] = 1;
-        intUnit1_2Coords[y] = 0;
+        intUnit1_2Coords[x] = 2;
+        intUnit1_2Coords[y] = 1;
         
-        intUnit1_3Coords[x] = 0;
-        intUnit1_3Coords[y] = 1;
+        intUnit1_3Coords[x] = 1;
+        intUnit1_3Coords[y] = 2;
         
-        intUnit2_1Coords[x] = 17;
-        intUnit2_1Coords[y] = 10;
+        intUnit2_1Coords[x] = 16;
+        intUnit2_1Coords[y] = 9;
         
-        intUnit2_2Coords[x] = 16;
-        intUnit2_2Coords[y] = 10;
+        intUnit2_2Coords[x] = 15;
+        intUnit2_2Coords[y] = 9;
         
-        intUnit2_3Coords[x] = 17;
-        intUnit2_3Coords[y] = 9;
+        intUnit2_3Coords[x] = 16;
+        intUnit2_3Coords[y] = 8;
         
         lblUnit1_1.setLocation(pointLocation[intUnit1_1Coords[x]][intUnit1_1Coords[y]]);
         lblUnit1_2.setLocation(pointLocation[intUnit1_2Coords[x]][intUnit1_2Coords[y]]);
@@ -192,6 +189,10 @@ public class ConquestMap extends JFrame {
         for (int gridX = 0; gridX < booleanGridOccupied.length; gridX++) {
             for (int gridY = 0; gridY < booleanGridOccupied[gridX].length; gridY++) {
                 booleanGridOccupied[gridX][gridY] = false;
+                System.out.println(booleanGridOccupied[gridX][gridY] + ", " + gridX + ", " + gridY);
+                if (booleanGridOccupied[gridX][gridY]) {
+                    break;
+                }
             }
         }
     }
@@ -203,118 +204,123 @@ public class ConquestMap extends JFrame {
         //1 = up, 2 = right, 3 = down, 4 = left
         int x = 0, y = 1; //Coordinate axes
         resetGridOccupied();
-        switch (unitSelected) {
-            case 0:
-                switch (moveDirection) {
-                    case 1:
-                        intUnit1_1Coords[y] -= moveAmount;
-                        break;
-                    case 2:
-                        intUnit1_1Coords[x] += moveAmount;
-                        break;
-                    case 3:
-                        intUnit1_1Coords[y] += moveAmount;
-                        break;
-                    case 4:
-                        intUnit1_1Coords[x] -= moveAmount;
-                        break;
-                }
-                
-                log("successful setting at " + intUnit1_1Coords[x] + ", " + intUnit1_1Coords[y]);
-                break;
-            case 1:
-                switch (moveDirection) {
-                    case 1:
-                        intUnit1_2Coords[y] -= moveAmount;
-                        break;
-                    case 2:
-                        intUnit1_2Coords[x] += moveAmount;
-                        break;
-                    case 3:
-                        intUnit1_2Coords[y] += moveAmount;
-                        break;
-                    case 4:
-                        intUnit1_2Coords[x] -= moveAmount;
-                        break;
-                }
-               
-                log("successful setting at " + intUnit1_2Coords[x] + ", " + intUnit1_2Coords[y]);
-                break;
-            case 2:
-                switch (moveDirection) {
-                    case 1:
-                        intUnit1_3Coords[y] -= moveAmount;
-                        break;
-                    case 2:
-                        intUnit1_3Coords[x] += moveAmount;
-                        break;
-                    case 3:
-                        intUnit1_3Coords[y] += moveAmount;
-                        break;
-                    case 4:
-                        intUnit1_3Coords[x] -= moveAmount;
-                        break;
-                }
-                
-                log("successful setting at " + intUnit1_3Coords[x] + ", " + intUnit1_3Coords[y]);
-                break;
-            case 3:
-                switch (moveDirection) {
-                    case 1:
-                        intUnit2_1Coords[y] -= moveAmount;
-                        break;
-                    case 2:
-                        intUnit2_1Coords[x] += moveAmount;
-                        break;
-                    case 3:
-                        intUnit2_1Coords[y] += moveAmount;
-                        break;
-                    case 4:
-                        intUnit2_1Coords[x] -= moveAmount;
-                        break;
-                }
-                
-                log("successful setting at " + intUnit2_1Coords[x] + ", " + intUnit2_1Coords[y]);
-                break;
-            case 4:
-                switch (moveDirection) {
-                    case 1:
-                        intUnit2_2Coords[y] -= moveAmount;
-                        break;
-                    case 2:
-                        intUnit2_2Coords[x] += moveAmount;
-                        break;
-                    case 3:
-                        intUnit2_2Coords[y] += moveAmount;
-                        break;
-                    case 4:
-                        intUnit2_2Coords[x] -= moveAmount;
-                        break;
-                }
-                
-                log("successful setting at " + intUnit2_1Coords[x] + ", " + intUnit2_1Coords[y]);
-                break;
-            case 5:
-                switch (moveDirection) {
-                    case 1:
-                        intUnit2_3Coords[y] -= moveAmount;
-                        break;
-                    case 2:
-                        intUnit2_3Coords[x] += moveAmount;
-                        break;
-                    case 3:
-                        intUnit2_3Coords[y] += moveAmount;
-                        break;
-                    case 4:
-                        intUnit2_3Coords[x] -= moveAmount;
-                        break;
-                }
-                
-                log("successful setting at " + intUnit2_1Coords[x] + ", " + intUnit2_1Coords[y]);
-                break;
-            default:
-                log("Invalid unit selection");
-                break;
+        try {
+            switch (unitSelected) {
+                case 0:
+                    switch (moveDirection) {
+                        case 1:
+                            intUnit1_1Coords[y] -= moveAmount;
+                            break;
+                        case 2:
+                            intUnit1_1Coords[x] += moveAmount;
+                            break;
+                        case 3:
+                            intUnit1_1Coords[y] += moveAmount;
+                            break;
+                        case 4:
+                            intUnit1_1Coords[x] -= moveAmount;
+                            break;
+                    }
+
+                    log("successful setting at " + intUnit1_1Coords[x] + ", " + intUnit1_1Coords[y]);
+                    break;
+                case 1:
+                    switch (moveDirection) {
+                        case 1:
+                            intUnit1_2Coords[y] -= moveAmount;
+                            break;
+                        case 2:
+                            intUnit1_2Coords[x] += moveAmount;
+                            break;
+                        case 3:
+                            intUnit1_2Coords[y] += moveAmount;
+                            break;
+                        case 4:
+                            intUnit1_2Coords[x] -= moveAmount;
+                            break;
+                    }
+
+                    log("successful setting at " + intUnit1_2Coords[x] + ", " + intUnit1_2Coords[y]);
+                    break;
+                case 2:
+                    switch (moveDirection) {
+                        case 1:
+                            intUnit1_3Coords[y] -= moveAmount;
+                            break;
+                        case 2:
+                            intUnit1_3Coords[x] += moveAmount;
+                            break;
+                        case 3:
+                            intUnit1_3Coords[y] += moveAmount;
+                            break;
+                        case 4:
+                            intUnit1_3Coords[x] -= moveAmount;
+                            break;
+                    }
+
+                    log("successful setting at " + intUnit1_3Coords[x] + ", " + intUnit1_3Coords[y]);
+                    break;
+                case 3:
+                    switch (moveDirection) {
+                        case 1:
+                            intUnit2_1Coords[y] -= moveAmount;
+                            break;
+                        case 2:
+                            intUnit2_1Coords[x] += moveAmount;
+                            break;
+                        case 3:
+                            intUnit2_1Coords[y] += moveAmount;
+                            break;
+                        case 4:
+                            intUnit2_1Coords[x] -= moveAmount;
+                            break;
+                    }
+
+                    log("successful setting at " + intUnit2_1Coords[x] + ", " + intUnit2_1Coords[y]);
+                    break;
+                case 4:
+                    switch (moveDirection) {
+                        case 1:
+                            intUnit2_2Coords[y] -= moveAmount;
+                            break;
+                        case 2:
+                            intUnit2_2Coords[x] += moveAmount;
+                            break;
+                        case 3:
+                            intUnit2_2Coords[y] += moveAmount;
+                            break;
+                        case 4:
+                            intUnit2_2Coords[x] -= moveAmount;
+                            break;
+                    }
+
+                    log("successful setting at " + intUnit2_2Coords[x] + ", " + intUnit2_2Coords[y]);
+                    break;
+                case 5:
+                    switch (moveDirection) {
+                        case 1:
+                            intUnit2_3Coords[y] -= moveAmount;
+                            break;
+                        case 2:
+                            intUnit2_3Coords[x] += moveAmount;
+                            break;
+                        case 3:
+                            intUnit2_3Coords[y] += moveAmount;
+                            break;
+                        case 4:
+                            intUnit2_3Coords[x] -= moveAmount;
+                            break;
+                    }
+
+                    log("successful setting at " + intUnit2_3Coords[x] + ", " + intUnit2_3Coords[y]);
+                    break;
+                default:
+                    log("Invalid unit selection");
+                    break;
+            }
+        }
+        catch (Exception ex) {
+        
         }
         booleanGridOccupied[intUnit1_1Coords[x]][intUnit1_1Coords[y]] = true;
         booleanGridOccupied[intUnit1_2Coords[x]][intUnit1_2Coords[y]] = true;
@@ -323,7 +329,45 @@ public class ConquestMap extends JFrame {
         booleanGridOccupied[intUnit2_2Coords[x]][intUnit2_2Coords[y]] = true;
         booleanGridOccupied[intUnit2_3Coords[x]][intUnit2_3Coords[y]] = true;
     }
-    
+    public static boolean[] checkGridOccupied(int unitSelected) {
+        int x = 0, y = 1; //Coordinate axes
+        boolean[] booleanButtonGreyOut = new boolean[4]; //0 = up, 1 = right, 2 = down, 3 = left.
+        for (int i = 0; i < booleanButtonGreyOut.length; i++) {
+            booleanButtonGreyOut[i] = false;
+        }
+        
+        System.out.println(intUnit1_1Coords[x] + ", " + intUnit1_1Coords[y]);
+        switch (unitSelected) {
+            case 0:
+                if (intUnit1_1Coords[y] > 0) {
+                    if (booleanGridOccupied[intUnit1_1Coords[x]][intUnit1_1Coords[y] - 1]) {
+                        booleanButtonGreyOut[0] = true;
+                    }
+                }
+                if (intUnit1_1Coords[x] < 17) {
+                    if (booleanGridOccupied[intUnit1_1Coords[x] + 1][intUnit1_1Coords[y]]) {
+                        booleanButtonGreyOut[1] = true;
+                    }
+                }
+                if (intUnit1_1Coords[y] < 10) {
+                    if (booleanGridOccupied[intUnit1_1Coords[x]][intUnit1_1Coords[y] + 1]) {
+                        booleanButtonGreyOut[2] = true;
+                    }
+                }
+                if (intUnit1_1Coords[x] > 0) {
+                    if (booleanGridOccupied[intUnit1_1Coords[x] - 1][intUnit1_1Coords[y]]) {
+                        booleanButtonGreyOut[3] = true;
+                    }
+                }
+                
+                break;
+                //Add more for other units here.
+            default:
+                break;
+        }
+        
+        return booleanButtonGreyOut;
+    }
     //Unit movement methods
     public static void move(int moveDirection) {
         //1 = up, 2 = right, 3 = down, 4 = left
