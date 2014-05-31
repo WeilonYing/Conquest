@@ -1,7 +1,5 @@
 TO DO
 ======
-Add unit collision.
 Add capture system.
-Add label that shows the player which unit is currently selected.
 Add backgrounds to all windows.
 Add a battlefield map to ConquestMap.java.

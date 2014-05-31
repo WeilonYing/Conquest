@@ -67,6 +67,9 @@ public class Conquest extends JFrame {
     private final JButton btnRollDice = new JButton("Roll Dice");
     private final JButton btnEndTurn = new JButton("End Turn");
     
+    private final JButton btnAttack = new JButton("Attack");
+    private final JButton btnCapture = new JButton("Capture");
+    
     //Declare labels
     private final JLabel lblUnit1Power = new JLabel("0");
     private final JLabel lblUnit2Power = new JLabel("0");
@@ -89,7 +92,7 @@ public class Conquest extends JFrame {
         
         setLayout(null);
         setResizable(false);
-        setSize(500, 400);
+        setSize(600, 400);
         setAlwaysOnTop(true);
         setLocationRelativeTo(null);
         setLblUnitPower();
@@ -157,6 +160,9 @@ public class Conquest extends JFrame {
         
         add(btnEndTurn);
         add(btnRollDice);
+        
+        add(btnAttack);
+        add(btnCapture);
     }
     private void initActionListeners() { //Create ActionListeners
         /*
@@ -224,6 +230,17 @@ public class Conquest extends JFrame {
                 btnRollDicePressed(evt);
             }
         });
+        
+        btnAttack.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                btnAttackPressed(evt);
+            }
+        });
+        btnCapture.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                btnCapturePressed(evt);
+            }
+        });
     }
     private void initLabels() {
         /*
@@ -254,22 +271,28 @@ public class Conquest extends JFrame {
         btnMoveLeft.setBounds((boundaryX - 220), (boundaryY - 190), 60, 60);
         btnMoveRight.setBounds((boundaryX - 100), (boundaryY - 190), 60, 60);
 
-        btnSelectUnit1.setBounds((boundaryX - 450), (boundaryY - 220), 100, 40);
-        btnSelectUnit2.setBounds((boundaryX - 450), (boundaryY - 170), 100, 40);
-        btnSelectUnit3.setBounds((boundaryX - 450), (boundaryY - 120), 100, 40);
+        btnSelectUnit1.setBounds((boundaryX - 550), (boundaryY - 220), 100, 40);
+        btnSelectUnit2.setBounds((boundaryX - 550), (boundaryY - 170), 100, 40);
+        btnSelectUnit3.setBounds((boundaryX - 550), (boundaryY - 120), 100, 40);
         
-        btnUpgradeUnit1.setBounds((boundaryX - 350), (boundaryY - 220), 50, 40);
-        btnUpgradeUnit2.setBounds((boundaryX - 350), (boundaryY - 170), 50, 40);
-        btnUpgradeUnit3.setBounds((boundaryX - 350), (boundaryY - 120), 50, 40);
+        btnUpgradeUnit1.setBounds((boundaryX - 450), (boundaryY - 220), 50, 40);
+        btnUpgradeUnit2.setBounds((boundaryX - 450), (boundaryY - 170), 50, 40);
+        btnUpgradeUnit3.setBounds((boundaryX - 450), (boundaryY - 120), 50, 40);
         
         btnEndTurn.setBounds((boundaryX - 150), (boundaryY - 20), 100, 40);
         btnRollDice.setBounds((boundaryX - 150), (boundaryY - 60), 100, 40);
-
+        
+        btnAttack.setBounds((boundaryX - 350), (boundaryY - 60), 150, 40);
+        btnCapture.setBounds((boundaryX - 350), (boundaryY - 20), 150, 40);
         //Set button fonts
         Font fontBold = new Font("sans-serif", Font.BOLD, 18);
+        Font fontMedium = new Font("sans-serif", Font.PLAIN, 14);
         btnUpgradeUnit1.setFont(fontBold);
         btnUpgradeUnit2.setFont(fontBold);
         btnUpgradeUnit3.setFont(fontBold);
+        
+        btnAttack.setFont(fontMedium);
+        btnCapture.setFont(fontMedium);
         
         //Move count related buttons are disabled initially
         toggleMoveCountButtonState(false);
@@ -281,17 +304,17 @@ public class Conquest extends JFrame {
         //label.setBounds(LocationX, LocationY, SizeX, SizeY
         int boundaryX = this.getSize().width, boundaryY = this.getSize().height;
         
-        lblUnit1Power.setBounds(boundaryX - 475, boundaryY - 205, 30, 10);
-        lblUnit2Power.setBounds(boundaryX - 475, boundaryY - 155, 30, 10);
-        lblUnit3Power.setBounds(boundaryX - 475, boundaryY - 105, 30, 10);
+        lblUnit1Power.setBounds(boundaryX - 575, boundaryY - 205, 30, 10);
+        lblUnit2Power.setBounds(boundaryX - 575, boundaryY - 155, 30, 10);
+        lblUnit3Power.setBounds(boundaryX - 575, boundaryY - 105, 30, 10);
         
-        lblWhoseTurn.setBounds(boundaryX - 475, boundaryY - 70, 200, 30);
-        lblNumMoves.setBounds(boundaryX - 475, boundaryY - 40, 200, 30);
-        lblCurrentSelectedUnit.setBounds((boundaryX - 475), (boundaryY - 10), 200, 30);
+        lblWhoseTurn.setBounds(boundaryX - 575, boundaryY - 70, 200, 30);
+        lblNumMoves.setBounds(boundaryX - 575, boundaryY - 40, 200, 30);
+        lblCurrentSelectedUnit.setBounds((boundaryX - 575), (boundaryY - 10), 200, 30);
         
-        lblPlayer1.setBounds(boundaryX - 500, boundaryY - 300, 150, 30);
-        lblPlayer2.setBounds(boundaryX - 200, boundaryY - 300, 150, 30);
-        lblVs.setBounds(boundaryX - 300, boundaryY - 300, 30, 30);
+        lblPlayer1.setBounds(boundaryX - 550, boundaryY - 300, 150, 30);
+        lblPlayer2.setBounds(boundaryX - 250, boundaryY - 300, 150, 30);
+        lblVs.setBounds(boundaryX - 350, boundaryY - 300, 30, 30);
         
         //Sets the font parameters of the labels. By default it is serif, plain and font size 10
         Font fontStandard = new Font("sans-serif", Font.PLAIN, 16);
@@ -593,10 +616,12 @@ public class Conquest extends JFrame {
         //Select a unit by setting the appropriate array index to true and all others false.
         if (booleanIsPlayer1Turn) {
             for (int i = 0; i < booleanPlayer1UnitSelected.length; i++) {
+                //Deselect all units before selecting the unit specified
                 booleanPlayer1UnitSelected[i] = false;
             }
             booleanPlayer1UnitSelected[unitNumber] = true;
             checkPossibleMoveDirections();
+            ConquestCombat.checkAttackPossibility(unitNumber);
             booleanUnitSelected = true;
         }
         else {
@@ -697,6 +722,12 @@ public class Conquest extends JFrame {
     private void btnRollDicePressed(ActionEvent evt) {
         rollDice();
     }
+    private void btnAttackPressed(ActionEvent evt) {
+        
+    }
+    private void btnCapturePressed(ActionEvent evt) {
+        
+    }
     
     //Auto-generated code below
     /**
@@ -714,7 +745,7 @@ public class Conquest extends JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 500, Short.MAX_VALUE)
+            .addGap(0, 600, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
