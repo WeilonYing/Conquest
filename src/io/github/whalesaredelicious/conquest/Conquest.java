@@ -92,7 +92,7 @@ public class Conquest extends JFrame {
         
         setLayout(null);
         setResizable(false);
-        setSize(600, 400);
+        setSize(600, 400); //Screen size
         setAlwaysOnTop(true);
         setLocationRelativeTo(null);
         setLblUnitPower();
