@@ -25,6 +25,7 @@ import static java.util.logging.Logger.getLogger;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -38,17 +39,20 @@ public class Conquest extends JFrame {
     
     public int intNumMoves = 0;
     
-    public int intUnit1_1Power = 1;
-    public int intUnit1_2Power = 1;
-    public int intUnit1_3Power = 1;
-    public int intUnit2_1Power = 1;
-    public int intUnit2_2Power = 1;
-    public int intUnit2_3Power = 1;
+    public static int intUnit1_1Power = 1;
+    public static int intUnit1_2Power = 1;
+    public static int intUnit1_3Power = 1;
+    public static int intUnit2_1Power = 1;
+    public static int intUnit2_2Power = 1;
+    public static int intUnit2_3Power = 1;
+    
+    public static boolean[] booleanUnitKilled = new boolean[6];
     
     public static boolean booleanIsPlayer1Turn = true;
     public static boolean[] booleanPlayer1UnitSelected = new boolean[3];
     public static boolean[] booleanPlayer2UnitSelected = new boolean[3];
     private boolean booleanUnitSelected = false; //Used to prevent decrementing a move when unit is not selected.
+    private boolean booleanAttackMode = false; //When true, attack mode is activated.
     
     //Declare control buttons
     public final JButton btnMoveUp = new JButton("Up");
@@ -89,6 +93,7 @@ public class Conquest extends JFrame {
         initComponents();
         initControls();
         initLabels();
+        initUnitsKilled();
         
         setLayout(null);
         setResizable(false);
@@ -260,6 +265,14 @@ public class Conquest extends JFrame {
         add(lblPlayer2);
         add(lblVs);
     }
+    private void initUnitsKilled() {
+        /**
+         * Set units killed status to false.
+         */
+        for (int i = 0; i < booleanUnitKilled.length; i++) {
+            booleanUnitKilled[i] = false;
+        }
+    }
     private void setButtonParameters() {
         //Sets the size and location of the buttons.
 
@@ -356,49 +369,43 @@ public class Conquest extends JFrame {
     }
     private void upgradeUnit(int unitNumber, int upgradeAmount) { //Makes the relevant checks, then processes the unit upgrade.
         //If invalid unit selected, boolean flag will prevent a move being subtracted from the player.
-        boolean booleanUpgradeSuccessful = false;
-        if (booleanIsPlayer1Turn) {
-            switch (unitNumber) {
-                case 1:
-                    intUnit1_1Power += upgradeAmount;
-                    booleanUpgradeSuccessful = true;
-                    break;
-                case 2:
-                    intUnit1_2Power += upgradeAmount;
-                    booleanUpgradeSuccessful = true;
-                    break;
-                case 3:
-                    intUnit1_3Power += upgradeAmount;
-                    booleanUpgradeSuccessful = true;
-                    break;
-                default:
-                    log("Invalid unit number");
-                    break;
+        if (processMove(upgradeAmount)) { //Ensures player has enough moves to execute upgrade.
+            if (booleanIsPlayer1Turn) {
+                switch (unitNumber) {
+                    case 1:
+                        intUnit1_1Power += upgradeAmount;
+                        break;
+                    case 2:
+                        intUnit1_2Power += upgradeAmount;
+                        break;
+                    case 3:
+                        intUnit1_3Power += upgradeAmount;
+                        break;
+                    default:
+                        log("Invalid unit number");
+                        break;
+                }
+            }
+            else {
+                switch (unitNumber) {
+                    case 1:
+                        intUnit2_1Power += upgradeAmount;
+                        break;
+                    case 2:
+                        intUnit2_2Power += upgradeAmount;
+                        break;
+                    case 3:
+                        intUnit2_3Power += upgradeAmount;
+                        break;
+                    default:
+                        log("Invalid unit number");
+                }
             }
         }
-        else {
-            switch (unitNumber) {
-                case 1:
-                    intUnit2_1Power += upgradeAmount;
-                    booleanUpgradeSuccessful = true;
-                    break;
-                case 2:
-                    intUnit2_2Power += upgradeAmount;
-                    booleanUpgradeSuccessful = true;
-                    break;
-                case 3:
-                    intUnit2_3Power += upgradeAmount;
-                    booleanUpgradeSuccessful = true;
-                    break;
-                default:
-                    log("Invalid unit number");
-            }
-        }
+        
         limitUnitPower();
         setLblUnitPower();
-        if (booleanUpgradeSuccessful) {
-            processMove(upgradeAmount);
-        }
+        
         checkPossibleMoveDirections();
     }
     private void limitUnitPower() {
@@ -415,8 +422,77 @@ public class Conquest extends JFrame {
         if (intUnit2_2Power > 9001) {intUnit2_2Power = 9001;}
         if (intUnit2_3Power > 9001) {intUnit2_3Power = 9001;}
     }
+    private void attackMode() {
+        int unitSelected;
+        boolean[] booleanAttackPossibility = new boolean[4];
+        
+        booleanAttackPossibility = ConquestCombat.checkAttackPossibility();
+        setAttackDirections(booleanAttackPossibility);
+    }
+    public void checkUnitKilled() {
+        //Check for which units are killed.
+        for (int unitNumber = 0; unitNumber < booleanUnitKilled.length; unitNumber++) {
+            if (booleanUnitKilled[unitNumber]) {
+                ConquestMap.disableUnit(unitNumber);
+            }
+        }
+        
+        //Disable appropriate unit buttons if they are killed.
+        if (booleanIsPlayer1Turn) {
+            if (booleanUnitKilled[0]) {
+                btnSelectUnit1.setEnabled(false);
+            }
+            if (booleanUnitKilled[1]) {
+                btnSelectUnit2.setEnabled(false);
+            }
+            if (booleanUnitKilled[2]) {
+                btnSelectUnit3.setEnabled(false);
+            }  
+        }
+        else {
+            if (booleanUnitKilled[3]) {
+                btnSelectUnit1.setEnabled(false);
+            }
+            if (booleanUnitKilled[4]) {
+                btnSelectUnit2.setEnabled(false);
+            }
+            if (booleanUnitKilled[5]) {
+                btnSelectUnit3.setEnabled(false);
+            }
+            
+        }
+    }
     
     //GUI management methods
+    private void setAttackDirections(boolean booleanAttackPossibility[]) {
+        boolean booleanPossibleAttack = false;
+        for (int i = 0; i < booleanAttackPossibility.length; i++) {
+            if (booleanAttackPossibility[i]) {
+                booleanPossibleAttack = true;
+                break;
+            }
+        }
+        if (booleanPossibleAttack) {
+            toggleMoveCountButtonState(false);
+
+            if (booleanAttackPossibility[0]) {
+                btnMoveUp.setEnabled(true);
+            }
+            if (booleanAttackPossibility[1]) {
+                btnMoveRight.setEnabled(true);
+            }
+            if (booleanAttackPossibility[2]) {
+                btnMoveDown.setEnabled(true);
+            }
+            if (booleanAttackPossibility[3]) {
+                btnMoveLeft.setEnabled(true);
+            }
+        }
+        else {
+            booleanAttackMode = false;
+            msgBox("There are no enemies near your selected unit.", "No enemy units found", "plain");
+        }
+    }
     private void setNumTurnsLabel (int num) {
         lblNumMoves.setText("No. of moves left: " + Integer.toString(num));
     }
@@ -594,6 +670,8 @@ public class Conquest extends JFrame {
                         break;
                 }
                 break;
+            default:
+                break;
         }
         boolean[] booleanButtonGreyOut = new boolean[4];
         System.out.println("Unit Selected: " + unitSelected);
@@ -621,7 +699,7 @@ public class Conquest extends JFrame {
             }
             booleanPlayer1UnitSelected[unitNumber] = true;
             checkPossibleMoveDirections();
-            ConquestCombat.checkAttackPossibility(unitNumber);
+            
             booleanUnitSelected = true;
         }
         else {
@@ -663,17 +741,28 @@ public class Conquest extends JFrame {
     }
     private void rollDice() { //Generate a random integer between 1-6
         intNumMoves = (RandomIntGenerator(1, 6));
-        intNumMoves = 9001;
+        intNumMoves = 100;
         setNumTurnsLabel(intNumMoves);
         
         //Re-enable the buttons
         toggleMoveCountButtonState(true);
         
+        
         //Disable the Roll Dice button after use.
         btnRollDice.setEnabled(false);
         
         //Check possible move directions if unit is already selected.
-        checkPossibleMoveDirections();
+        if (booleanUnitSelected) {
+            checkPossibleMoveDirections();
+        }
+        else {
+            toggleMoveCountButtonState(false);
+        }
+        
+        //Re-enable upgrade buttons
+        btnUpgradeUnit1.setEnabled(true);
+        btnUpgradeUnit2.setEnabled(true);
+        btnUpgradeUnit3.setEnabled(true);
     }
     
     //General purpose methods
@@ -684,18 +773,56 @@ public class Conquest extends JFrame {
         int number = (minvalue + (int)(Math.random() * ((maxvalue - minvalue) + 1)));
         return number;
     }
+    private void msgBox(String message, String title, String messageType) { //Method to make sending of message dialog boxes to the user easier to do.
+        if (messageType == null) { //If programmer is uninterested in looking up dialog box types, just use null.
+            JOptionPane.showMessageDialog(this, message, title, JOptionPane.PLAIN_MESSAGE);
+        }
+        else {
+            messageType = messageType.toLowerCase(); //Ensures strings with capitalised letters do not get misinterpreted.
+            switch (messageType) { //Use of simple keywords in order to make dialog box creation easier and less tedious.
+                case "info": //Information message dialog box
+                    JOptionPane.showMessageDialog(this, message, title, JOptionPane.INFORMATION_MESSAGE);
+                    break;
+                case "warning": //Warning message dialog box
+                    JOptionPane.showMessageDialog(this, message, title, JOptionPane.WARNING_MESSAGE);
+                    break;
+                case "error": //Error message dialog box
+                    JOptionPane.showMessageDialog(this, message, title, JOptionPane.ERROR_MESSAGE);
+                    break;
+                case "plain": //Plain message dialog box
+                    JOptionPane.showMessageDialog(this, message, title, JOptionPane.PLAIN_MESSAGE);
+                    break;
+                default: //If messageType is not any of the above, default to plain message.
+                    log("messageType string value: " + messageType + " could not be recognised. Defaulting to plain message."); //Inform programmer of this.
+                    JOptionPane.showMessageDialog(this, message, title, JOptionPane.PLAIN_MESSAGE);
+                    break;
+            }
+        }
+    }
     
     //ActionEvent Responders - event driven methods for responding to button presses
     private void btnMoveUpPressed(ActionEvent evt) {
+        if (booleanAttackMode) {
+            ConquestCombat.attackUnit(0);
+        }
         prepareMove(1);
     }
     private void btnMoveDownPressed(ActionEvent evt) {
+        if (booleanAttackMode) {
+            ConquestCombat.attackUnit(2);
+        }
         prepareMove(3);
     }
     private void btnMoveLeftPressed(ActionEvent evt) {
+        if (booleanAttackMode) {
+            ConquestCombat.attackUnit(3);
+        }
         prepareMove(4);
     }
     private void btnMoveRightPressed(ActionEvent evt) {
+        if (booleanAttackMode) {
+            ConquestCombat.attackUnit(1);
+        }
         prepareMove(2);
     }
     private void btnSelectUnit1Pressed(ActionEvent evt) {
@@ -723,10 +850,23 @@ public class Conquest extends JFrame {
         rollDice();
     }
     private void btnAttackPressed(ActionEvent evt) {
-        
+        //Toggle attack mode.
+        if (!booleanAttackMode) {
+            if (booleanUnitSelected) {
+                booleanAttackMode = true;
+                attackMode();
+            }
+            else {
+                msgBox("You must select a unit to activate Attack Mode.", "Select a unit", "plain");
+            }
+        }
+        else {
+            booleanAttackMode = false;
+            checkPossibleMoveDirections();
+        }
     }
     private void btnCapturePressed(ActionEvent evt) {
-        
+
     }
     
     //Auto-generated code below

@@ -150,6 +150,7 @@ public final class ConquestMap extends JFrame {
             }
         }
     }
+
     private void initUnitLocations() {
         int x = 0, y = 1; //These represent the coordinate axes
         intUnit1_1Coords[x] = 1;
@@ -322,12 +323,14 @@ public final class ConquestMap extends JFrame {
         catch (Exception ex) {
         
         }
-        booleanGridOccupied[intUnit1_1Coords[x]][intUnit1_1Coords[y]] = true;
-        booleanGridOccupied[intUnit1_2Coords[x]][intUnit1_2Coords[y]] = true;
-        booleanGridOccupied[intUnit1_3Coords[x]][intUnit1_3Coords[y]] = true;
-        booleanGridOccupied[intUnit2_1Coords[x]][intUnit2_1Coords[y]] = true;
-        booleanGridOccupied[intUnit2_2Coords[x]][intUnit2_2Coords[y]] = true;
-        booleanGridOccupied[intUnit2_3Coords[x]][intUnit2_3Coords[y]] = true;
+        
+        //Check if unit is still alive before setting their grid occupied status.
+        if (!Conquest.booleanUnitKilled[0]) {booleanGridOccupied[intUnit1_1Coords[x]][intUnit1_1Coords[y]] = true; }
+        if (!Conquest.booleanUnitKilled[1]) {booleanGridOccupied[intUnit1_2Coords[x]][intUnit1_2Coords[y]] = true; }
+        if (!Conquest.booleanUnitKilled[2]) {booleanGridOccupied[intUnit1_3Coords[x]][intUnit1_3Coords[y]] = true; }
+        if (!Conquest.booleanUnitKilled[3]) {booleanGridOccupied[intUnit2_1Coords[x]][intUnit2_1Coords[y]] = true; }
+        if (!Conquest.booleanUnitKilled[4]) {booleanGridOccupied[intUnit2_2Coords[x]][intUnit2_2Coords[y]] = true; }
+        if (!Conquest.booleanUnitKilled[5]) {booleanGridOccupied[intUnit2_3Coords[x]][intUnit2_3Coords[y]] = true; }
     }
     public static boolean[] checkGridOccupied(int unitSelected) {
         int x = 0, y = 1; //Coordinate axes
@@ -339,36 +342,157 @@ public final class ConquestMap extends JFrame {
         System.out.println(intUnit1_1Coords[x] + ", " + intUnit1_1Coords[y]);
         switch (unitSelected) {
             case 0:
-                if (intUnit1_1Coords[y] > 0) {
-                    if (booleanGridOccupied[intUnit1_1Coords[x]][intUnit1_1Coords[y] - 1]) {
-                        booleanButtonGreyOut[0] = true;
+                if (!Conquest.booleanUnitKilled[0]) { //if unit is not killed.
+                    if (intUnit1_1Coords[y] > 0) {
+                        if (booleanGridOccupied[intUnit1_1Coords[x]][intUnit1_1Coords[y] - 1]) { //up
+                            booleanButtonGreyOut[0] = true;
+                        }
+                    }
+                    if (intUnit1_1Coords[x] < 17) {
+                        if (booleanGridOccupied[intUnit1_1Coords[x] + 1][intUnit1_1Coords[y]]) { //right
+                            booleanButtonGreyOut[1] = true;
+                        }
+                    }
+                    if (intUnit1_1Coords[y] < 10) {
+                        if (booleanGridOccupied[intUnit1_1Coords[x]][intUnit1_1Coords[y] + 1]) { //down
+                            booleanButtonGreyOut[2] = true;
+                        }
+                    }
+                    if (intUnit1_1Coords[x] > 0) {
+                        if (booleanGridOccupied[intUnit1_1Coords[x] - 1][intUnit1_1Coords[y]]) { //left
+                            booleanButtonGreyOut[3] = true;
+                        }
                     }
                 }
-                if (intUnit1_1Coords[x] < 17) {
-                    if (booleanGridOccupied[intUnit1_1Coords[x] + 1][intUnit1_1Coords[y]]) {
-                        booleanButtonGreyOut[1] = true;
-                    }
-                }
-                if (intUnit1_1Coords[y] < 10) {
-                    if (booleanGridOccupied[intUnit1_1Coords[x]][intUnit1_1Coords[y] + 1]) {
-                        booleanButtonGreyOut[2] = true;
-                    }
-                }
-                if (intUnit1_1Coords[x] > 0) {
-                    if (booleanGridOccupied[intUnit1_1Coords[x] - 1][intUnit1_1Coords[y]]) {
-                        booleanButtonGreyOut[3] = true;
-                    }
-                }
-                
                 break;
-                //Add more for other units here.
+            case 1:
+                if (!Conquest.booleanUnitKilled[1]) {
+                    if (intUnit1_2Coords[y] > 0) {
+                        if (booleanGridOccupied[intUnit1_2Coords[x]][intUnit1_2Coords[y] - 1]) {
+                            booleanButtonGreyOut[0] = true;
+                        }
+                    }
+                    if (intUnit1_2Coords[x] < 17) {
+                        if (booleanGridOccupied[intUnit1_2Coords[x] + 1][intUnit1_2Coords[y]]) {
+                            booleanButtonGreyOut[1] = true;
+                        }
+                    }
+                    if (intUnit1_2Coords[y] < 10) {
+                        if (booleanGridOccupied[intUnit1_2Coords[x]][intUnit1_2Coords[y] + 1]) {
+                            booleanButtonGreyOut[2] = true;
+                        }
+                    }
+                    if (intUnit1_2Coords[x] > 0) {
+                        if (booleanGridOccupied[intUnit1_2Coords[x] - 1][intUnit1_2Coords[y]]) {
+                            booleanButtonGreyOut[3] = true;
+                        }
+                    }
+                }
+                break;
+            case 2:
+                if (!Conquest.booleanUnitKilled[2]) {
+                    if (intUnit1_3Coords[y] > 0) {
+                        if (booleanGridOccupied[intUnit1_3Coords[x]][intUnit1_3Coords[y] - 1]) {
+                            booleanButtonGreyOut[0] = true;
+                        }
+                    }
+                    if (intUnit1_3Coords[x] < 17) {
+                        if (booleanGridOccupied[intUnit1_3Coords[x] + 1][intUnit1_3Coords[y]]) {
+                            booleanButtonGreyOut[1] = true;
+                        }
+                    }
+                    if (intUnit1_3Coords[y] < 10) {
+                        if (booleanGridOccupied[intUnit1_3Coords[x]][intUnit1_3Coords[y] + 1]) {
+                            booleanButtonGreyOut[2] = true;
+                        }
+                    }
+                    if (intUnit1_3Coords[x] > 0) {
+                        if (booleanGridOccupied[intUnit1_3Coords[x] - 1][intUnit1_3Coords[y]]) {
+                            booleanButtonGreyOut[3] = true;
+                        }
+                    }
+                }
+                break;
+            case 3:
+                if (!Conquest.booleanUnitKilled[3]) {
+                    if (intUnit2_1Coords[y] > 0) {
+                        if (booleanGridOccupied[intUnit2_1Coords[x]][intUnit2_1Coords[y] - 1]) {
+                            booleanButtonGreyOut[0] = true;
+                        }
+                    }
+                    if (intUnit2_1Coords[x] < 17) {
+                        if (booleanGridOccupied[intUnit2_1Coords[x] + 1][intUnit2_1Coords[y]]) {
+                            booleanButtonGreyOut[1] = true;
+                        }
+                    }
+                    if (intUnit2_1Coords[y] < 10) {
+                        if (booleanGridOccupied[intUnit2_1Coords[x]][intUnit2_1Coords[y] + 1]) {
+                            booleanButtonGreyOut[2] = true;
+                        }
+                    }
+                    if (intUnit2_1Coords[x] > 0) {
+                        if (booleanGridOccupied[intUnit2_1Coords[x] - 1][intUnit2_1Coords[y]]) {
+                            booleanButtonGreyOut[3] = true;
+                        }
+                    }
+                }
+                break;
+            case 4:
+                if (!Conquest.booleanUnitKilled[3]) {
+                    if (intUnit2_2Coords[y] > 0) {
+                        if (booleanGridOccupied[intUnit2_2Coords[x]][intUnit2_2Coords[y] - 1]) {
+                            booleanButtonGreyOut[0] = true;
+                        }
+                    }
+                    if (intUnit2_2Coords[x] < 17) {
+                        if (booleanGridOccupied[intUnit2_2Coords[x] + 1][intUnit2_2Coords[y]]) {
+                            booleanButtonGreyOut[1] = true;
+                        }
+                    }
+                    if (intUnit2_2Coords[y] < 10) {
+                        if (booleanGridOccupied[intUnit2_2Coords[x]][intUnit2_2Coords[y] + 1]) {
+                            booleanButtonGreyOut[2] = true;
+                        }
+                    }
+                    if (intUnit2_2Coords[x] > 0) {
+                        if (booleanGridOccupied[intUnit2_2Coords[x] - 1][intUnit2_2Coords[y]]) {
+                            booleanButtonGreyOut[3] = true;
+                        }
+                    }
+                }
+                break;
+            case 5:
+                if (!Conquest.booleanUnitKilled[2]) {
+                    if (intUnit2_3Coords[y] > 0) {
+                        if (booleanGridOccupied[intUnit2_3Coords[x]][intUnit2_3Coords[y] - 1]) {
+                            booleanButtonGreyOut[0] = true;
+                        }
+                    }
+                    if (intUnit2_3Coords[x] < 17) {
+                        if (booleanGridOccupied[intUnit2_3Coords[x] + 1][intUnit2_3Coords[y]]) {
+                            booleanButtonGreyOut[1] = true;
+                        }
+                    }
+                    if (intUnit2_3Coords[y] < 10) {
+                        if (booleanGridOccupied[intUnit2_3Coords[x]][intUnit2_3Coords[y] + 1]) {
+                            booleanButtonGreyOut[2] = true;
+                        }
+                    }
+                    if (intUnit2_3Coords[x] > 0) {
+                        if (booleanGridOccupied[intUnit2_3Coords[x] - 1][intUnit2_3Coords[y]]) {
+                            booleanButtonGreyOut[3] = true;
+                        }
+                    }
+                }
+                break;
             default:
+                log("Invalid unit selected for checkGridOccupied");
                 break;
         }
         
         return booleanButtonGreyOut;
     }
-    //Unit movement methods
+    //Unit management methods
     public static void move(int moveDirection) {
         //1 = up, 2 = right, 3 = down, 4 = left
         if (Conquest.booleanIsPlayer1Turn) {
@@ -383,12 +507,10 @@ public final class ConquestMap extends JFrame {
             for (int i = 0; i < Conquest.booleanPlayer2UnitSelected.length; i++) {
                 if (Conquest.booleanPlayer2UnitSelected[i]) {
                     moveUnit(i + 3, moveDirection);
-                    //checkPossibleMoveDirections(i + 3);
                     break;
                 }
             }
         }
-        
     }
     private static void moveUnit(int unitSelected, int moveDirection) {
         setGridOccupied(unitSelected, moveDirection, 1);
@@ -450,6 +572,40 @@ public final class ConquestMap extends JFrame {
                 
         }
         return pointNewLocation;
+    }
+    public static void disableUnit(int unitNumber) { //Remove a unit from the battlefield, then set its proviously occupied space to false;
+        int x = 0, y = 1; //Coordinate axes
+        switch (unitNumber) {
+            case 0:
+                lblUnit1_1.setVisible(false);
+                booleanGridOccupied[intUnit1_1Coords[x]][intUnit1_1Coords[y]] = false;
+                break;
+            case 1:
+                booleanGridOccupied[intUnit1_2Coords[x]][intUnit1_2Coords[y]] = false;
+                lblUnit1_2.setVisible(false);
+                break;
+            case 2:
+                booleanGridOccupied[intUnit1_3Coords[x]][intUnit1_3Coords[y]] = false;
+                lblUnit1_3.setVisible(false);
+                break;
+            case 3:
+                booleanGridOccupied[intUnit2_1Coords[x]][intUnit2_1Coords[y]] = false;
+                lblUnit2_1.setVisible(false);
+                break;
+            case 4:
+                booleanGridOccupied[intUnit2_2Coords[x]][intUnit2_2Coords[y]] = false;
+                lblUnit2_2.setVisible(false);
+                break;
+            case 5:
+                booleanGridOccupied[intUnit2_3Coords[x]][intUnit2_3Coords[y]] = false;
+                lblUnit2_3.setVisible(false);
+                break;
+            default:
+                log("Invalid unit number (disableUnit)");
+                break;
+                
+        }
+
     }
     
     //General purpose methods
