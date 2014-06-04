@@ -16,306 +16,151 @@
 
 package io.github.whalesaredelicious.conquest;
 
-import javax.swing.JOptionPane;
-
 /**
  *
- * @author Weilon
+ * @author Weilon Ying
  */
+
+
 public class ConquestCombat {
-    
-    private static boolean[] booleanAttackPossibility = new boolean[4];
-    
-    //Unit scanning methods.
-    public static boolean[] checkAttackPossibility() {
-        int unitSelected = findSelectedUnit();
-
-        booleanAttackPossibility = checkPlayerUnits(unitSelected);
-        return booleanAttackPossibility;
-    }
-    private static boolean[] checkPlayerUnits (int unitSelected) {
-        int[] intUnitCoords = new int[2];
-
-        intUnitCoords = getUnitCoords(unitSelected);
-        booleanAttackPossibility = findOccupiedAdjacentEnemies(intUnitCoords);
-        return booleanAttackPossibility;
-    }
-
-    private static int[] getUnitCoords(int unitSelected) {
+    public static boolean[] checkAttackPossibility(int unitSelected) {
+        //Holds true/false values as to whether attacking in a particular direction is possible.
+        boolean[] booleanAttackPossible = new boolean[4];
+        int[] intUnitSelectedCoords = new int[2];
+        //Initialise all indexes in array as false.
+        for (int i = 0; i < booleanAttackPossible.length; i++) {
+            booleanAttackPossible[i] = false;
+        }
+        intUnitSelectedCoords = getUnitCoords(unitSelected);
+        
         int x = 0, y = 1; //Coordinate axes
-        int[] intUnitCoords = new int[2];
+        //Find enemy units in all four directions
+        //Check upwards
+        try {
+            booleanAttackPossible[0] = findEnemyUnits(intUnitSelectedCoords[0], intUnitSelectedCoords[1] - 1);
+        }
+        catch (IndexOutOfBoundsException e) { //If checking outside the battlefield, it will cause out of bounds exception.
+            booleanAttackPossible[0] = false;
+        }
+        //Check right
+        try {
+            booleanAttackPossible[1] = findEnemyUnits(intUnitSelectedCoords[0] + 1, intUnitSelectedCoords[1]);
+        }
+        catch (IndexOutOfBoundsException e) { //If checking outside the battlefield, it will cause out of bounds exception.
+            booleanAttackPossible[1] = false;
+        }
+        //Check down
+        try {
+            booleanAttackPossible[2] = findEnemyUnits(intUnitSelectedCoords[0], intUnitSelectedCoords[1] + 1);
+        }
+        catch (IndexOutOfBoundsException e) { //If checking outside the battlefield, it will cause out of bounds exception.
+            booleanAttackPossible[2] = false;
+        }
+        //Check left
+        try {
+            booleanAttackPossible[3] = findEnemyUnits(intUnitSelectedCoords[0] - 1, intUnitSelectedCoords[1]);
+        }
+        catch (IndexOutOfBoundsException e) { //If checking outside the battlefield, it will cause out of bounds exception.
+            booleanAttackPossible[3] = false;
+        }
+        
+        return booleanAttackPossible;
+    }
+    public static int[] getUnitCoords(int unitSelected) {
+        int x = 0, y = 1; //Coordinate axes
+        int[] intCoords = new int[2];
         switch (unitSelected) {
             case 0:
-                for (int i = 0; i < intUnitCoords.length; i++) {
-                    intUnitCoords[i] = ConquestMap.intUnit1_1Coords[i];
-                }
+                intCoords[x] = ConquestMap.intUnit1_1Coords[x];
+                intCoords[y] = ConquestMap.intUnit1_1Coords[y];
                 break;
             case 1:
-                for (int i = 0; i < intUnitCoords.length; i++) {
-                    intUnitCoords[i] = ConquestMap.intUnit1_2Coords[i];
-                }
+                intCoords[x] = ConquestMap.intUnit1_2Coords[x];
+                intCoords[y] = ConquestMap.intUnit1_2Coords[y];
                 break;
             case 2:
-                for (int i = 0; i < intUnitCoords.length; i++) {
-                    intUnitCoords[i] = ConquestMap.intUnit1_3Coords[i];
-                }
+                intCoords[x] = ConquestMap.intUnit1_3Coords[x];
+                intCoords[y] = ConquestMap.intUnit1_3Coords[y];
                 break;
             case 3:
-                for (int i = 0; i < intUnitCoords.length; i++) {
-                    intUnitCoords[i] = ConquestMap.intUnit2_1Coords[i];
-                }
+                intCoords[x] = ConquestMap.intUnit2_1Coords[x];
+                intCoords[y] = ConquestMap.intUnit2_1Coords[y];
                 break;
             case 4:
-                for (int i = 0; i < intUnitCoords.length; i++) {
-                    intUnitCoords[i] = ConquestMap.intUnit2_2Coords[i];
-                }
+                intCoords[x] = ConquestMap.intUnit2_2Coords[x];
+                intCoords[y] = ConquestMap.intUnit2_2Coords[y];
                 break;
             case 5:
-                for (int i = 0; i < intUnitCoords.length; i++) {
-                    intUnitCoords[i] = ConquestMap.intUnit2_3Coords[i];
-                }
+                intCoords[x] = ConquestMap.intUnit2_3Coords[x];
+                intCoords[y] = ConquestMap.intUnit2_3Coords[y];
                 break;
-                //Add more cases for additional units
-                
         }
-        return intUnitCoords;
+        return intCoords;
     }
-    private static boolean[] findOccupiedAdjacentEnemies(int[] intUnitCoords) {
-        boolean[] booleanAdjacentEnemy = new boolean[4];
-        int x = 0, y = 1; //Coordinate axes
-        for (int i = 0; i < booleanAdjacentEnemy.length; i++) { //Setting all variables to false initially.
-            booleanAdjacentEnemy[i] = false;
-        }
-        
-        if (intUnitCoords[y] > 0) {
-            if (ConquestMap.booleanGridOccupied[intUnitCoords[x]][intUnitCoords[y] - 1]) { //up
-                booleanAdjacentEnemy[0] = findEnemyUnits(intUnitCoords[x], intUnitCoords[y] - 1);
-            }
-        }
-        if (intUnitCoords[x] < 17) {
-            if (ConquestMap.booleanGridOccupied[intUnitCoords[x] + 1][intUnitCoords[y]]) { //right
-                booleanAdjacentEnemy[1] = findEnemyUnits(intUnitCoords[x] + 1, intUnitCoords[y]);
-            }
-        }
-        if (intUnitCoords[y] < 10) {
-            if (ConquestMap.booleanGridOccupied[intUnitCoords[x]][intUnitCoords[y] + 1]) { //down
-                booleanAdjacentEnemy[2] = findEnemyUnits(intUnitCoords[x], intUnitCoords[y] + 1);
-            }
-        }
-        if (intUnitCoords[x] > 0) {
-            if (ConquestMap.booleanGridOccupied[intUnitCoords[x] - 1][intUnitCoords[y]]) { //left
-                booleanAdjacentEnemy[3] = findEnemyUnits(intUnitCoords[x] - 1, intUnitCoords[y]);
-            }
-        }
-        return booleanAdjacentEnemy;
-    }
-    private static boolean findEnemyUnits(int gridX, int gridY) { //Check if there is an enemy unit in the specified location.
+    private static boolean findEnemyUnits(int gridX, int gridY) {
         boolean booleanEnemyFound = false;
         int x = 0, y = 1; //Coordinate axes
-        if (Conquest.booleanIsPlayer1Turn) {
-            if (ConquestMap.intUnit2_1Coords[x] == gridX && ConquestMap.intUnit2_1Coords[y] == gridY) {
-                booleanEnemyFound = true;
-            }
-            if (ConquestMap.intUnit2_2Coords[x] == gridX && ConquestMap.intUnit2_1Coords[y] == gridY) {
-                booleanEnemyFound = true;
-            }
-            if (ConquestMap.intUnit2_3Coords[x] == gridX && ConquestMap.intUnit2_1Coords[y] == gridY) {
-                booleanEnemyFound = true;
-            }
-        }
-        else {
-            if (ConquestMap.intUnit1_1Coords[x] == gridX && ConquestMap.intUnit1_1Coords[y] == gridY) {
-                booleanEnemyFound = true;
-            }
-            if (ConquestMap.intUnit1_2Coords[x] == gridX && ConquestMap.intUnit1_1Coords[y] == gridY) {
-                booleanEnemyFound = true;
-            }
-            if (ConquestMap.intUnit1_3Coords[x] == gridX && ConquestMap.intUnit1_1Coords[y] == gridY) {
-                booleanEnemyFound = true;
-            }
-        }
-        return booleanEnemyFound;
-    }
-    private static int findSpecificEnemyUnit(int[] unitCoords, int attackDirection) {
-        int x = 0, y = 1; //Coordinate axes
-        
-        //Find coordinates to check on.
-        switch (attackDirection) {
-            case 0:
-                if (unitCoords[y] > 0) {
-                    unitCoords[y] -= 1;
+        try {
+            if (Conquest.booleanIsPlayer1Turn) {
+                if (ConquestMap.intUnit2_1Coords[x] == gridX && ConquestMap.intUnit2_1Coords[y] == gridY) {
+                    booleanEnemyFound = true;
                 }
-                break;
-            case 1:
-                if (unitCoords[x] < 17) {
-                    unitCoords[y] += 1;
+                if (ConquestMap.intUnit2_2Coords[x] == gridX && ConquestMap.intUnit2_2Coords[y] == gridY) {
+                    booleanEnemyFound = true;
                 }
-                break;
-            case 2:
-                if (unitCoords[y] < 10) {
-                    unitCoords[y] += 1;
-                }
-                break;
-            case 3:
-                if (unitCoords[x] > 0) {
-                    unitCoords[x] -= 1;
-                }
-                break;
-            default:
-                log("Invalid move direction at findSpecificEnemyUnit");
-                return 9999; //Since invalid move direction called. Returning a sentinel value.
-        }
-        
-        if (Conquest.booleanIsPlayer1Turn) {
-            if (ConquestMap.intUnit2_1Coords[x] == unitCoords[x] && ConquestMap.intUnit2_1Coords[y] == unitCoords[y]) {
-                return 3;
-            }
-            if (ConquestMap.intUnit2_2Coords[x] == unitCoords[x] && ConquestMap.intUnit2_2Coords[y] == unitCoords[y]) {
-                return 4;
-            }
-            if (ConquestMap.intUnit2_3Coords[x] == unitCoords[x] && ConquestMap.intUnit2_3Coords[y] == unitCoords[y]) {
-                return 5;
-            }
-        }
-        else if (!Conquest.booleanIsPlayer1Turn) {
-            if (ConquestMap.intUnit1_1Coords[x] == unitCoords[x] && ConquestMap.intUnit1_1Coords[y] == unitCoords[y]) {
-                return 0;
-            }
-            if (ConquestMap.intUnit1_2Coords[x] == unitCoords[x] && ConquestMap.intUnit1_2Coords[y] == unitCoords[y]) {
-                return 1;
-            }
-            if (ConquestMap.intUnit1_3Coords[x] == unitCoords[x] && ConquestMap.intUnit1_3Coords[y] == unitCoords[y]) {
-                return 2;
-            }
-        }
-        else {
-            return 9999; //No units found, return sentinel value.
-        }
-        return 9999; //If no results, return sentinel value.
-    }
-    private static int findSelectedUnit() {
-        int unitSelected = 9999; //If no unit is selected, a sentinel value will be returned.
-        if (Conquest.booleanIsPlayer1Turn) {
-            for (int i = 0; i < Conquest.booleanPlayer1UnitSelected.length; i++) {
-                if (Conquest.booleanPlayer1UnitSelected[i]) {
-                    unitSelected = i;
-                }
-            }
-        }
-        else {
-            for (int i = 0; i < Conquest.booleanPlayer2UnitSelected.length; i++) {
-                if (Conquest.booleanPlayer2UnitSelected[i]) {
-                    unitSelected = i;
-                }
-            }
-        }
-        return unitSelected;
-    }
-    
-    //Unit attack methods.
-    public static void attackUnit(int attackDirection) {
-        int[] unitCoords = new int[2]; //Unit coordinates
-        int enemyUnit, attackingUnit;
-        int attackingUnitPower = 0, enemyUnitPower = 0;
-        boolean[] booleanAdjacentEnemies = new boolean[4];
-        
-        attackingUnit = findSelectedUnit(); //Get the current selected unit.
-        
-        unitCoords = getUnitCoords(attackingUnit); //Get unit coordinates.
-        booleanAdjacentEnemies = findOccupiedAdjacentEnemies(unitCoords);
-        
-        if (booleanAdjacentEnemies[attackDirection]) { //Checks for adjacent enemies
-            
-            enemyUnit = findSpecificEnemyUnit(unitCoords, attackDirection); //Finds a specific enemy to target.
-            
-            //Get power levels
-            attackingUnitPower = getPowerLevel(attackingUnit);
-            enemyUnitPower = getPowerLevel(enemyUnit);
-            if (enemyUnit <= 5 && attackingUnit <= 5) {
-                if (attackingUnitPower > enemyUnitPower) {
-                    killUnit(enemyUnit);
-                    setUnitPowerLevel(attackingUnit, attackingUnitPower - enemyUnitPower);
-                }
-                else if (attackingUnitPower < enemyUnitPower) {
-                    killUnit(attackingUnit);
-                    setUnitPowerLevel(enemyUnit, enemyUnitPower - attackingUnitPower);
-                }
-                else {
-                    killUnit(attackingUnit);
-                    killUnit(enemyUnit);
+                if (ConquestMap.intUnit2_3Coords[x] == gridX && ConquestMap.intUnit2_3Coords[y] == gridY) {
+                    booleanEnemyFound = true;
                 }
             }
             else {
-                msgBox("Invalid unit", "error", "error");
+                if (ConquestMap.intUnit1_1Coords[x] == gridX && ConquestMap.intUnit1_1Coords[y] == gridY) {
+                    booleanEnemyFound = true;
+                }
+                if (ConquestMap.intUnit1_2Coords[x] == gridX && ConquestMap.intUnit1_2Coords[y] == gridY) {
+                    booleanEnemyFound = true;
+                }
+                if (ConquestMap.intUnit1_3Coords[x] == gridX && ConquestMap.intUnit1_3Coords[y] == gridY) {
+                    booleanEnemyFound = true;
+                }
             }
         }
-        else {
-            log("No adjacent enemies found (attackUnit)");
+        catch (IndexOutOfBoundsException e) { //If out of bounds, definitely no enemy unit there.
+            return false;
         }
+        return booleanEnemyFound;
     }
-    private static int getPowerLevel(int unitNumber) {
-        int powerLevel = 0;
-        switch (unitNumber) {
-            case 0:
-                powerLevel = Conquest.intUnit1_1Power;
-                break;
-            case 1:
-                powerLevel = Conquest.intUnit1_1Power;
-                break;
-            case 2:
-                powerLevel = Conquest.intUnit1_1Power;
-                break;
-            case 3:
-                powerLevel = Conquest.intUnit1_1Power;
-                break;
-            case 4:
-                powerLevel = Conquest.intUnit1_1Power;
-                break;
-            case 5:
-                powerLevel = Conquest.intUnit1_1Power;
-                break;
-            default:
-                log("Invalid unit number");
-                powerLevel = 0;
-                break;
-        }
-        return powerLevel;
-    }
-    private static void killUnit(int unitNumber) {
-        Conquest.booleanUnitKilled[unitNumber] = true;
-        log("Unit " + Integer.toString(unitNumber) + " has been killed.");
-    }
-    private static void setUnitPowerLevel(int unitNumber, int newPowerLevel) {
-        
-    }
-    //General purpose methods.
-    private static void log(String message) {
-        System.out.println(message);
-    }
-    private static void msgBox(String message, String title, String messageType) { //Method to make sending of message dialog boxes to the user easier to do.
-        if (messageType == null) { //If programmer is uninterested in looking up dialog box types, just use null.
-            JOptionPane.showMessageDialog(null, message, title, JOptionPane.PLAIN_MESSAGE);
-        }
-        else {
-            messageType = messageType.toLowerCase(); //Ensures strings with capitalised letters do not get misinterpreted.
-            switch (messageType) { //Use of simple keywords in order to make dialog box creation easier and less tedious.
-                case "info": //Information message dialog box
-                    JOptionPane.showMessageDialog(null, message, title, JOptionPane.INFORMATION_MESSAGE);
-                    break;
-                case "warning": //Warning message dialog box
-                    JOptionPane.showMessageDialog(null, message, title, JOptionPane.WARNING_MESSAGE);
-                    break;
-                case "error": //Error message dialog box
-                    JOptionPane.showMessageDialog(null, message, title, JOptionPane.ERROR_MESSAGE);
-                    break;
-                case "plain": //Plain message dialog box
-                    JOptionPane.showMessageDialog(null, message, title, JOptionPane.PLAIN_MESSAGE);
-                    break;
-                default: //If messageType is not any of the above, default to plain message.
-                    log("messageType string value: " + messageType + " could not be recognised. Defaulting to plain message."); //Inform programmer of this.
-                    JOptionPane.showMessageDialog(null, message, title, JOptionPane.PLAIN_MESSAGE);
-                    break;
+    public static int findSpecificEnemyUnit(int gridX, int gridY) {
+        int intEnemyFound = 999; //999 is a sentinel value that the method will return if no unit found.
+        int x = 0, y = 1; //Coordinate axes
+        try {
+            if (Conquest.booleanIsPlayer1Turn) {
+                if (ConquestMap.intUnit2_1Coords[x] == gridX && ConquestMap.intUnit2_1Coords[y] == gridY) {
+                    intEnemyFound = 3;
+                }
+                if (ConquestMap.intUnit2_2Coords[x] == gridX && ConquestMap.intUnit2_2Coords[y] == gridY) {
+                    intEnemyFound = 4;
+                }
+                if (ConquestMap.intUnit2_3Coords[x] == gridX && ConquestMap.intUnit2_3Coords[y] == gridY) {
+                    intEnemyFound = 5;
+                }
+            }
+            else {
+                if (ConquestMap.intUnit1_1Coords[x] == gridX && ConquestMap.intUnit1_1Coords[y] == gridY) {
+                    intEnemyFound = 0;
+                }
+                if (ConquestMap.intUnit1_2Coords[x] == gridX && ConquestMap.intUnit1_2Coords[y] == gridY) {
+                    intEnemyFound = 1;
+                }
+                if (ConquestMap.intUnit1_3Coords[x] == gridX && ConquestMap.intUnit1_3Coords[y] == gridY) {
+                    intEnemyFound = 2;
+                }
             }
         }
+        catch (IndexOutOfBoundsException e) { //If out of bounds, definitely no enemy unit there.
+            return 999;
+        }
+        System.out.println("Unit 2_2 Coords:" + ConquestMap.intUnit2_2Coords[0] + ", " + ConquestMap.intUnit2_2Coords[1]);
+        //System.out.println("Enemy unit found: " + intEnemyFound);
+        return intEnemyFound;
     }
-}
+}   

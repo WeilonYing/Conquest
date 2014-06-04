@@ -179,7 +179,7 @@ public final class ConquestMap extends JFrame {
         lblUnit2_3.setLocation(pointLocation[intUnit2_3Coords[x]][intUnit2_3Coords[y]]);
         
         int intNumOfTotalUnits = 6; //Change this if total starting unit count is changed.
-        for (int i = 0; i < (intNumOfTotalUnits - 1); i++) {
+        for (int i = 0; i < (intNumOfTotalUnits); i++) {
             //This ensures that the starting locations are flagged as occupied at the start of the game.
             setGridOccupied(i, 1, 0);
         }
@@ -190,7 +190,6 @@ public final class ConquestMap extends JFrame {
         for (int gridX = 0; gridX < booleanGridOccupied.length; gridX++) {
             for (int gridY = 0; gridY < booleanGridOccupied[gridX].length; gridY++) {
                 booleanGridOccupied[gridX][gridY] = false;
-                System.out.println(booleanGridOccupied[gridX][gridY] + ", " + gridX + ", " + gridY);
                 if (booleanGridOccupied[gridX][gridY]) {
                     break;
                 }
@@ -320,8 +319,10 @@ public final class ConquestMap extends JFrame {
                     break;
             }
         }
-        catch (Exception ex) {
-        
+        catch (IndexOutOfBoundsException ex) {
+            msgBox("Conquest has suffered a critical error and needs to close. Please notify the developer. "
+                    + "Error: IndexOutOfBoundsException in ConquestMap.setGridOccupied", "Critical Error", "error");
+            System.exit(0);
         }
         
         //Check if unit is still alive before setting their grid occupied status.
