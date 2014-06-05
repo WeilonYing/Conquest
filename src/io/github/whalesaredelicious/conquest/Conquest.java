@@ -465,17 +465,20 @@ public class Conquest extends JFrame {
             //Find the defending unit.
             int defendingUnit = 999; //Sentinel value if no defending unit found.
             switch (direction) { //Find the unit depending on direction chosen.
-                case 0: //up
+                case 1: //up
                     defendingUnit = ConquestCombat.findSpecificEnemyUnit(unitSelectedCoords[x], unitSelectedCoords[y] - 1);
                     break;
-                case 1: //right
+                case 2: //right
                     defendingUnit = ConquestCombat.findSpecificEnemyUnit(unitSelectedCoords[x] + 1, unitSelectedCoords[y]);
                     break;
-                case 2: //down
+                case 3: //down
                     defendingUnit = ConquestCombat.findSpecificEnemyUnit(unitSelectedCoords[x], unitSelectedCoords[y] + 1);
                     break;
-                case 3: //left
+                case 4: //left
                     defendingUnit = ConquestCombat.findSpecificEnemyUnit(unitSelectedCoords[x] - 1, unitSelectedCoords[y]);
+                    break;
+                default:
+                    log("Invalid direction sent (attackUnit)");
                     break;
             }
             
