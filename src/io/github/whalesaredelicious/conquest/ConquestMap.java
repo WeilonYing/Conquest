@@ -47,6 +47,7 @@ public final class ConquestMap extends JFrame {
         setSize(905, 600);
         setResizable(false);
         setLocationRelativeTo(null);
+        panelUnits.setOpaque(false);
     }
 
     //Auto-generated code below
@@ -54,39 +55,56 @@ public final class ConquestMap extends JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        panelUnits = new javax.swing.JPanel();
         lblUnit1_1 = new javax.swing.JLabel();
         lblUnit1_2 = new javax.swing.JLabel();
         lblUnit1_3 = new javax.swing.JLabel();
         lblUnit2_1 = new javax.swing.JLabel();
         lblUnit2_2 = new javax.swing.JLabel();
         lblUnit2_3 = new javax.swing.JLabel();
+        panelMap = new javax.swing.JPanel();
+        lblMap = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(null);
 
+        panelUnits.setLayout(null);
+
         lblUnit1_1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/io/github/whalesaredelicious/conquest/assets/soldier.png"))); // NOI18N
-        getContentPane().add(lblUnit1_1);
+        panelUnits.add(lblUnit1_1);
         lblUnit1_1.setBounds(10, 10, 60, 60);
 
         lblUnit1_2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/io/github/whalesaredelicious/conquest/assets/soldier.png"))); // NOI18N
-        getContentPane().add(lblUnit1_2);
+        panelUnits.add(lblUnit1_2);
         lblUnit1_2.setBounds(76, 11, 60, 60);
 
         lblUnit1_3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/io/github/whalesaredelicious/conquest/assets/soldier.png"))); // NOI18N
-        getContentPane().add(lblUnit1_3);
+        panelUnits.add(lblUnit1_3);
         lblUnit1_3.setBounds(10, 77, 60, 60);
 
         lblUnit2_1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/io/github/whalesaredelicious/conquest/assets/soldier.png"))); // NOI18N
-        getContentPane().add(lblUnit2_1);
+        panelUnits.add(lblUnit2_1);
         lblUnit2_1.setBounds(835, 529, 60, 60);
 
         lblUnit2_2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/io/github/whalesaredelicious/conquest/assets/soldier.png"))); // NOI18N
-        getContentPane().add(lblUnit2_2);
+        panelUnits.add(lblUnit2_2);
         lblUnit2_2.setBounds(769, 529, 60, 60);
 
         lblUnit2_3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/io/github/whalesaredelicious/conquest/assets/soldier.png"))); // NOI18N
-        getContentPane().add(lblUnit2_3);
+        panelUnits.add(lblUnit2_3);
         lblUnit2_3.setBounds(835, 470, 60, 60);
+
+        getContentPane().add(panelUnits);
+        panelUnits.setBounds(0, 0, 900, 600);
+
+        panelMap.setLayout(null);
+
+        lblMap.setIcon(new javax.swing.ImageIcon(getClass().getResource("/io/github/whalesaredelicious/conquest/assets/Map.png"))); // NOI18N
+        panelMap.add(lblMap);
+        lblMap.setBounds(0, 0, 910, 610);
+
+        getContentPane().add(panelMap);
+        panelMap.setBounds(0, 0, 900, 600);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -574,39 +592,59 @@ public final class ConquestMap extends JFrame {
         }
         return pointNewLocation;
     }
+    public static void disableUnitGridOccupied(int unitNumber) {
+        /**
+         * Set a killed unit's previously occupied space to false. 
+         * This must be called once only when the unit has been killed to prevent
+         * setting a grid occupied status to false when a later unit occupies it.
+         */ 
+        int x = 0, y = 1; //Coordinate axes
+        switch (unitNumber) {
+            case 0:
+                booleanGridOccupied[intUnit1_1Coords[x]][intUnit1_1Coords[y]] = false;
+                break;
+            case 1:
+                booleanGridOccupied[intUnit1_2Coords[x]][intUnit1_2Coords[y]] = false;
+                break;
+            case 2:
+                booleanGridOccupied[intUnit1_3Coords[x]][intUnit1_3Coords[y]] = false;                
+                break;
+            case 3:
+                booleanGridOccupied[intUnit2_1Coords[x]][intUnit2_1Coords[y]] = false;                
+                break;
+            case 4:
+                booleanGridOccupied[intUnit2_2Coords[x]][intUnit2_2Coords[y]] = false;
+                break;
+            case 5:
+                booleanGridOccupied[intUnit2_3Coords[x]][intUnit2_3Coords[y]] = false;                
+                break;
+        }
+    }
     public static void disableUnit(int unitNumber) { //Remove a unit from the battlefield, then set its proviously occupied space to false;
         int x = 0, y = 1; //Coordinate axes
         switch (unitNumber) {
             case 0:
                 lblUnit1_1.setVisible(false);
-                booleanGridOccupied[intUnit1_1Coords[x]][intUnit1_1Coords[y]] = false;
                 break;
-            case 1:
-                booleanGridOccupied[intUnit1_2Coords[x]][intUnit1_2Coords[y]] = false;
+            case 1:           
                 lblUnit1_2.setVisible(false);
                 break;
             case 2:
-                booleanGridOccupied[intUnit1_3Coords[x]][intUnit1_3Coords[y]] = false;
                 lblUnit1_3.setVisible(false);
                 break;
             case 3:
-                booleanGridOccupied[intUnit2_1Coords[x]][intUnit2_1Coords[y]] = false;
                 lblUnit2_1.setVisible(false);
                 break;
             case 4:
-                booleanGridOccupied[intUnit2_2Coords[x]][intUnit2_2Coords[y]] = false;
                 lblUnit2_2.setVisible(false);
                 break;
             case 5:
-                booleanGridOccupied[intUnit2_3Coords[x]][intUnit2_3Coords[y]] = false;
                 lblUnit2_3.setVisible(false);
                 break;
             default:
                 log("Invalid unit number (disableUnit)");
                 break;
-                
         }
-
     }
     
     //General purpose methods
@@ -641,11 +679,14 @@ public final class ConquestMap extends JFrame {
     }
     //Auto-generated code below.
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel lblMap;
     private static javax.swing.JLabel lblUnit1_1;
     private static javax.swing.JLabel lblUnit1_2;
     private static javax.swing.JLabel lblUnit1_3;
     private static javax.swing.JLabel lblUnit2_1;
     private static javax.swing.JLabel lblUnit2_2;
     private static javax.swing.JLabel lblUnit2_3;
+    private javax.swing.JPanel panelMap;
+    private javax.swing.JPanel panelUnits;
     // End of variables declaration//GEN-END:variables
 }

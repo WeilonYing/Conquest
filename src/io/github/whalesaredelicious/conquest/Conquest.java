@@ -452,6 +452,7 @@ public class Conquest extends JFrame {
             msgBox("No unit selected.", "Select a unit", "plain");
             disableAttackMode();
         }
+        checkUnitsKilled();
     }
     private void attackUnit(int direction) {
         int unitSelected = getSelectedUnit(); //If getSelectedUnit returns 999, no unit selected.
@@ -488,20 +489,173 @@ public class Conquest extends JFrame {
             }
             else {
                 int[] defendingUnitCoords = ConquestCombat.getUnitCoords(unitSelected);
-                log("So far so good!");
+                log("Defending unit found:" + Integer.toString(defendingUnit));
                 //To do, use direction
+                
+                unitBattle(unitSelected, defendingUnit, direction);
+            }
+            disableAttackMode(); //Disable attack mode after battle is completed.
+        }
+    }
+    private void unitBattle(int attackingUnit, int defendingUnit, int direction) {
+        int attackingUnitPower = getUnitPower(attackingUnit);
+        int defendingUnitPower = getUnitPower(defendingUnit);
+        
+        if (attackingUnitPower > defendingUnitPower) {
+            //kill defending unit
+            killUnit(defendingUnit);
+            log("Kill defending unit: " + Integer.toString(defendingUnit));
+        }
+        else if (attackingUnitPower < defendingUnitPower) {
+            //kill attacking unit
+            killUnit(attackingUnit);
+            booleanUnitSelected = false; //Unit can no longer be selected since it is killed.
+            log("Kill attacking unit: " + Integer.toString(attackingUnit));
+        }
+        else {
+            //kill both units
+            killUnit(defendingUnit);
+            killUnit(attackingUnit);
+            booleanUnitSelected = false; //Unit can no longer be selected since it is killed.
+            System.out.println("Kill both units: " + attackingUnit + ", " + defendingUnit);
+        }
+        checkUnitsKilled();
+    }
+    private void checkUnitsKilled() { //Checks which units are killed and disables the appropriate buttons.
+        for (int i = 0; i < booleanUnitKilled.length; i++) {
+            if (booleanUnitKilled[i]) {
+                disableUnitButtons(i);
+                ConquestMap.disableUnit(i);
+            }
+            else {
+                enableUnitButtons(i);
             }
         }
+    }
+    private void killUnit(int unitNumber) {
+        booleanUnitKilled[unitNumber] = true;
+        ConquestMap.disableUnitGridOccupied(unitNumber);
+        log("Unit " + Integer.toString(unitNumber) + " has been killed.");
+    }
+    private int getUnitPower(int unitNumber) {
+        int power = 0;
+        switch (unitNumber) {
+            case 0:
+                power = intUnit1_1Power;
+                break;
+            case 1:
+                power = intUnit1_2Power;
+                break;
+            case 2:
+                power = intUnit1_3Power;
+                break;
+            case 3:
+                power = intUnit2_1Power;
+                break;
+            case 4:
+                power = intUnit2_2Power;
+                break;
+            case 5:
+                power = intUnit2_3Power;
+                break;
+        }
+        return power;
     }
     private void disableAttackMode() {
         //Standard procedure to reset some parameters. Call this if you wish to stop Attack Mode. The method takes care of the rest.
         if (booleanUnitSelected) {
             checkPossibleMoveDirections();
         }
+        else {
+            toggleMoveCountButtonState(false, false);
+        }
         booleanAttackMode = false;
         log("Attack mode disabled");
+        checkUnitsKilled();
     }
     //GUI management methods
+    private void disableUnitButtons(int unitNumber) {
+        if (booleanIsPlayer1Turn) {
+            switch (unitNumber) {
+                case 0:
+                    btnSelectUnit1.setEnabled(false);
+                    btnUpgradeUnit1.setEnabled(false);
+                    break;
+                case 1:
+                    btnSelectUnit2.setEnabled(false);
+                    btnUpgradeUnit2.setEnabled(false);
+                    break;
+                case 2:
+                    btnSelectUnit3.setEnabled(false);
+                    btnUpgradeUnit2.setEnabled(false);
+                    break;
+                default:
+                    log("Invalid unit parameter. (disableUnitButtons)");
+                    break;
+            }
+        }
+        else {
+            switch (unitNumber) {
+                case 3:
+                    btnSelectUnit1.setEnabled(false);
+                    btnUpgradeUnit1.setEnabled(false);
+                    break;
+                case 4:
+                    btnSelectUnit2.setEnabled(false);
+                    btnUpgradeUnit2.setEnabled(false);
+                    break;
+                case 5:
+                    btnSelectUnit3.setEnabled(false);
+                    btnUpgradeUnit2.setEnabled(false);
+                    break;
+                default:
+                    log("Invalid unit parameter. (disableUnitButtons)");
+                    break;
+            }
+        }
+        log("Disable unit buttons called");
+    }
+    private void enableUnitButtons(int unitNumber) {
+         if (booleanIsPlayer1Turn) {
+            switch (unitNumber) {
+                case 0:
+                    btnSelectUnit1.setEnabled(true);
+                    btnUpgradeUnit1.setEnabled(true);
+                    break;
+                case 1:
+                    btnSelectUnit2.setEnabled(true);
+                    btnUpgradeUnit2.setEnabled(true);
+                    break;
+                case 2:
+                    btnSelectUnit3.setEnabled(true);
+                    btnUpgradeUnit2.setEnabled(true);
+                    break;
+                default:
+                    log("Invalid unit parameter. (disableUnitButtons)");
+                    break;
+            }
+        }
+        else {
+            switch (unitNumber) {
+                case 3:
+                    btnSelectUnit1.setEnabled(true);
+                    btnUpgradeUnit1.setEnabled(true);
+                    break;
+                case 4:
+                    btnSelectUnit2.setEnabled(true);
+                    btnUpgradeUnit2.setEnabled(true);
+                    break;
+                case 5:
+                    btnSelectUnit3.setEnabled(true);
+                    btnUpgradeUnit2.setEnabled(true);
+                    break;
+                default:
+                    log("Invalid unit parameter. (disableUnitButtons)");
+                    break;
+            }
+        }
+        log("Enable unit buttons called");
+    }
     private void setAttackDirections(boolean booleanAttackPossibility[]) {
         boolean booleanPossibleAttack = false;
         for (int i = 0; i < booleanAttackPossibility.length; i++) {
@@ -560,6 +714,7 @@ public class Conquest extends JFrame {
         btnUpgradeUnit1.setEnabled(upgradeState);
         btnUpgradeUnit2.setEnabled(upgradeState);
         btnUpgradeUnit3.setEnabled(upgradeState);
+        log("Move count buttons toggled");
     }
     private void checkPossibleMoveDirections() {
         //1 = up, 2 = right, 3 = down, 4 = left
@@ -611,6 +766,7 @@ public class Conquest extends JFrame {
             booleanUnitSelected = true;
         }
         lblCurrentSelectedUnit.setText("Current selected unit: " + Integer.toString(unitNumber + 1));
+        checkUnitsKilled(); //Check which units are killed so that they cannot be selected/upgraded.
     }
     private void changeTurn() {
         //Disable Attack Mode if still running so that Player 2 does not automatically enter Attack Mode.
@@ -634,13 +790,22 @@ public class Conquest extends JFrame {
         for (int i = 0; i < booleanPlayer2UnitSelected.length; i++) {
             booleanPlayer2UnitSelected[i] = false;
         }
+        
+        //Set unit selected to false.
+        
         booleanUnitSelected = false;
+        lblCurrentSelectedUnit.setText("Current selected unit: None");
+        
+        //Reset number of moves left
         intNumMoves = 0;
         setNumTurnsLabel(intNumMoves);
+        
+        //Display unit powers
         setLblUnitPower();
-        lblCurrentSelectedUnit.setText("Current selected unit: None");
-        toggleMoveCountButtonState(false, false);
-        btnRollDice.setEnabled(true);
+
+        toggleMoveCountButtonState(false, false); //disable all buttons.
+        btnRollDice.setEnabled(true); //enable roll dice button
+        checkUnitsKilled(); //check for units that have been killed.
     }
     private void rollDice() { //Generate a random integer between 1-6
         intNumMoves = (RandomIntGenerator(1, 6));
@@ -671,6 +836,9 @@ public class Conquest extends JFrame {
         if (booleanAttackMode) {
             attackMode();
         }
+        
+        //Check which units are killed
+        checkUnitsKilled();
     }
     
     //General purpose methods
@@ -864,12 +1032,15 @@ public class Conquest extends JFrame {
     }
     private void btnSelectUnit1Pressed(ActionEvent evt) {
         selectUnit(0);
+        disableAttackMode();
     }
     private void btnSelectUnit2Pressed(ActionEvent evt) {
         selectUnit(1);
+        disableAttackMode();
     }
     private void btnSelectUnit3Pressed(ActionEvent evt) {
         selectUnit(2);
+        disableAttackMode();
     }
     private void btnUpgradeUnit1Pressed(ActionEvent evt) {
         upgradeUnit(1, 1);
@@ -934,6 +1105,4 @@ public class Conquest extends JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
-
-
 }

@@ -102,24 +102,30 @@ public class ConquestCombat {
         int x = 0, y = 1; //Coordinate axes
         try {
             if (Conquest.booleanIsPlayer1Turn) {
-                if (ConquestMap.intUnit2_1Coords[x] == gridX && ConquestMap.intUnit2_1Coords[y] == gridY) {
+                if (ConquestMap.intUnit2_1Coords[x] == gridX && 
+                        ConquestMap.intUnit2_1Coords[y] == gridY && !Conquest.booleanUnitKilled[3]) {
                     booleanEnemyFound = true;
                 }
-                if (ConquestMap.intUnit2_2Coords[x] == gridX && ConquestMap.intUnit2_2Coords[y] == gridY) {
+                if (ConquestMap.intUnit2_2Coords[x] == gridX && 
+                        ConquestMap.intUnit2_2Coords[y] == gridY && !Conquest.booleanUnitKilled[4]) {
                     booleanEnemyFound = true;
                 }
-                if (ConquestMap.intUnit2_3Coords[x] == gridX && ConquestMap.intUnit2_3Coords[y] == gridY) {
+                if (ConquestMap.intUnit2_3Coords[x] == gridX && 
+                        ConquestMap.intUnit2_3Coords[y] == gridY && !Conquest.booleanUnitKilled[5]) {
                     booleanEnemyFound = true;
                 }
             }
             else {
-                if (ConquestMap.intUnit1_1Coords[x] == gridX && ConquestMap.intUnit1_1Coords[y] == gridY) {
+                if (ConquestMap.intUnit1_1Coords[x] == gridX && 
+                        ConquestMap.intUnit1_1Coords[y] == gridY && !Conquest.booleanUnitKilled[0]) {
                     booleanEnemyFound = true;
                 }
-                if (ConquestMap.intUnit1_2Coords[x] == gridX && ConquestMap.intUnit1_2Coords[y] == gridY) {
+                if (ConquestMap.intUnit1_2Coords[x] == gridX && 
+                        ConquestMap.intUnit1_2Coords[y] == gridY && !Conquest.booleanUnitKilled[1]) {
                     booleanEnemyFound = true;
                 }
-                if (ConquestMap.intUnit1_3Coords[x] == gridX && ConquestMap.intUnit1_3Coords[y] == gridY) {
+                if (ConquestMap.intUnit1_3Coords[x] == gridX && 
+                        ConquestMap.intUnit1_3Coords[y] == gridY && !Conquest.booleanUnitKilled[2]) {
                     booleanEnemyFound = true;
                 }
             }
@@ -134,24 +140,30 @@ public class ConquestCombat {
         int x = 0, y = 1; //Coordinate axes
         try {
             if (Conquest.booleanIsPlayer1Turn) {
-                if (ConquestMap.intUnit2_1Coords[x] == gridX && ConquestMap.intUnit2_1Coords[y] == gridY) {
+                if (ConquestMap.intUnit2_1Coords[x] == gridX && 
+                        ConquestMap.intUnit2_1Coords[y] == gridY && !Conquest.booleanUnitKilled[3]) {
                     intEnemyFound = 3;
                 }
-                if (ConquestMap.intUnit2_2Coords[x] == gridX && ConquestMap.intUnit2_2Coords[y] == gridY) {
+                if (ConquestMap.intUnit2_2Coords[x] == gridX && 
+                        ConquestMap.intUnit2_2Coords[y] == gridY && !Conquest.booleanUnitKilled[4]) {
                     intEnemyFound = 4;
                 }
-                if (ConquestMap.intUnit2_3Coords[x] == gridX && ConquestMap.intUnit2_3Coords[y] == gridY) {
+                if (ConquestMap.intUnit2_3Coords[x] == gridX && 
+                        ConquestMap.intUnit2_3Coords[y] == gridY && !Conquest.booleanUnitKilled[5]) {
                     intEnemyFound = 5;
                 }
             }
             else {
-                if (ConquestMap.intUnit1_1Coords[x] == gridX && ConquestMap.intUnit1_1Coords[y] == gridY) {
+                if (ConquestMap.intUnit1_1Coords[x] == gridX && 
+                        ConquestMap.intUnit1_1Coords[y] == gridY && !Conquest.booleanUnitKilled[0]) {
                     intEnemyFound = 0;
                 }
-                if (ConquestMap.intUnit1_2Coords[x] == gridX && ConquestMap.intUnit1_2Coords[y] == gridY) {
+                if (ConquestMap.intUnit1_2Coords[x] == gridX && 
+                        ConquestMap.intUnit1_2Coords[y] == gridY && !Conquest.booleanUnitKilled[1]) {
                     intEnemyFound = 1;
                 }
-                if (ConquestMap.intUnit1_3Coords[x] == gridX && ConquestMap.intUnit1_3Coords[y] == gridY) {
+                if (ConquestMap.intUnit1_3Coords[x] == gridX && 
+                        ConquestMap.intUnit1_3Coords[y] == gridY && !Conquest.booleanUnitKilled[2]) {
                     intEnemyFound = 2;
                 }
             }
@@ -159,8 +171,6 @@ public class ConquestCombat {
         catch (IndexOutOfBoundsException e) { //If out of bounds, definitely no enemy unit there.
             return 999;
         }
-        System.out.println("Unit 2_2 Coords:" + ConquestMap.intUnit2_2Coords[0] + ", " + ConquestMap.intUnit2_2Coords[1]);
-        //System.out.println("Enemy unit found: " + intEnemyFound);
         return intEnemyFound;
     }
 }   
