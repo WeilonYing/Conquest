@@ -16,8 +16,7 @@
 
     /**
      * TO DO:
-     * Checks to ensure that units cannot move off the grid.
-     * Prevent units from moving into each other.
+     * Capture system.
      */
 
 package io.github.whalesaredelicious.conquest;
@@ -37,7 +36,12 @@ public final class ConquestMap extends JFrame {
     public static int[] intUnit2_2Coords = new int[2];
     public static int[] intUnit2_3Coords = new int[2];
     
+    public static int[] intCapturePointA = new int[2], intCapturePointB = new int[2],
+            intCapturePointC = new int[2], intCapturePointD = new int[2];
+    public static int[][] intCapturePointLocations = new int[4][2];
+    
     public static boolean[][] booleanGridOccupied = new boolean[18][11];
+    public static boolean[][] booleanGridCapturePoints = new boolean[18][11];
     
     //Constructor method
     public ConquestMap() {
@@ -154,7 +158,7 @@ public final class ConquestMap extends JFrame {
         initPointLocation();
         resetGridOccupied();
         initUnitLocations();
-        
+        initCapturePoints();
     }
     private void initPointLocation() {
         //Make possible location points
@@ -162,11 +166,36 @@ public final class ConquestMap extends JFrame {
         for (int gridX = 0; gridX < pointLocation.length; gridX++) {
             for (int gridY = 0; gridY < pointLocation[gridY].length; gridY++) {
                 pointLocation[gridX][gridY] = new Point();
-                //log(Integer.toString(gridX) + ", " + Integer.toString(gridY));
                 pointLocation[gridX][gridY].x = gridX * intMoveAmount;
                 pointLocation[gridX][gridY].y = gridY * intMoveAmount;
             }
         }
+
+    }
+    private void initCapturePoints() {
+        int x = 0, y = 1; //Coordinate axes
+        
+        //Initialise grid capture points.
+        for (int gridX = 0; gridX < booleanGridCapturePoints.length; gridX++) {
+            for (int gridY = 0; gridY < booleanGridCapturePoints[gridX].length; gridY++) {
+                booleanGridCapturePoints[gridX][gridY] = false;
+            }
+        }
+        //Set capture point locations
+        intCapturePointA[x] = 7; intCapturePointA[y] = 2;
+        intCapturePointB[x] = 13; intCapturePointB[y] = 3;
+        intCapturePointC[x] = 4; intCapturePointC[y] = 8;
+        intCapturePointD[x] = 10; intCapturePointD[y] = 9;
+        
+        //Bind these locations to the capture points array.
+        intCapturePointLocations[0][0] = intCapturePointA[x];
+        intCapturePointLocations[0][1] = intCapturePointA[y];
+        intCapturePointLocations[1][0] = intCapturePointB[x];
+        intCapturePointLocations[1][1] = intCapturePointB[y];
+        intCapturePointLocations[2][0] = intCapturePointC[x];
+        intCapturePointLocations[2][1] = intCapturePointC[y];
+        intCapturePointLocations[3][0] = intCapturePointD[x];
+        intCapturePointLocations[3][1] = intCapturePointD[y];
     }
 
     private void initUnitLocations() {
@@ -457,7 +486,7 @@ public final class ConquestMap extends JFrame {
                 }
                 break;
             case 4:
-                if (!Conquest.booleanUnitKilled[3]) {
+                if (!Conquest.booleanUnitKilled[4]) {
                     if (intUnit2_2Coords[y] > 0) {
                         if (booleanGridOccupied[intUnit2_2Coords[x]][intUnit2_2Coords[y] - 1]) {
                             booleanButtonGreyOut[0] = true;
@@ -481,7 +510,7 @@ public final class ConquestMap extends JFrame {
                 }
                 break;
             case 5:
-                if (!Conquest.booleanUnitKilled[2]) {
+                if (!Conquest.booleanUnitKilled[5]) {
                     if (intUnit2_3Coords[y] > 0) {
                         if (booleanGridOccupied[intUnit2_3Coords[x]][intUnit2_3Coords[y] - 1]) {
                             booleanButtonGreyOut[0] = true;
@@ -510,6 +539,54 @@ public final class ConquestMap extends JFrame {
         }
         
         return booleanButtonGreyOut;
+    }
+    public static boolean findCapturePoint(int unitSelected) {
+        int x = 0, y = 1; //Coordinate axes
+        int[] intUnitLocation = new int[2];
+        switch (unitSelected) {
+            case 0:
+                for (int i = 0; i < intUnit1_1Coords.length; i++) {
+                    intUnitLocation[i] = intUnit1_1Coords[i];
+                }
+                break;
+            case 1:
+                for (int i = 0; i < intUnit1_2Coords.length; i++) {
+                    intUnitLocation[i] = intUnit1_2Coords[i];
+                }
+                break;
+            case 2:
+                for (int i = 0; i < intUnit1_3Coords.length; i++) {
+                    intUnitLocation[i] = intUnit1_3Coords[i];
+                }
+                break;
+            case 3:
+                for (int i = 0; i < intUnit2_1Coords.length; i++) {
+                    intUnitLocation[i] = intUnit2_1Coords[i];
+                }
+                break;
+            case 4:
+                for (int i = 0; i < intUnit2_2Coords.length; i++) {
+                    intUnitLocation[i] = intUnit2_2Coords[i];
+                }
+                break;
+            case 5:
+                for (int i = 0; i < intUnit2_3Coords.length; i++) {
+                    intUnitLocation[i] = intUnit2_3Coords[i];
+                }
+                break;
+            default:
+                log("Invalid unit number (findCapturePoint)");
+                break;
+        }
+        boolean booleanCapturePointFound = false;
+        for (int i = 0; i < intCapturePointLocations.length; i++) {
+            if (intUnitLocation[x] == intCapturePointLocations[i][x]
+                    && intUnitLocation[y] == intCapturePointLocations[i][y]) {
+                booleanCapturePointFound = true;
+                break;
+            }
+        }
+        return booleanCapturePointFound;
     }
     //Unit management methods
     public static void move(int moveDirection) {

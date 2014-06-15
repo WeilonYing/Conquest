@@ -46,6 +46,7 @@ public class Conquest extends JFrame {
     public static int intUnit2_2Power = 1;
     public static int intUnit2_3Power = 1;
     
+    private boolean booleanDiceRolled = false;
     public static boolean[] booleanUnitKilled = new boolean[6];
     
     public static boolean booleanIsPlayer1Turn = true;
@@ -95,12 +96,7 @@ public class Conquest extends JFrame {
         initLabels();
         initUnitsKilled();
         
-        setLayout(null);
-        setResizable(false);
-        setSize(600, 400); //Screen size
-        setAlwaysOnTop(true);
-        setLocationRelativeTo(null);
-        setLblUnitPower();
+        setScreenParameters();
     }
     
     //Main method
@@ -138,6 +134,14 @@ public class Conquest extends JFrame {
     }
     
     //Initialisation methods - setting up GUI elements
+    private void setScreenParameters() {
+        setLayout(null);
+        setResizable(false);
+        setSize(600, 400); //Screen size
+        setAlwaysOnTop(true);
+        setLocationRelativeTo(null);
+        setLblUnitPower();
+    }
     private void initControls() {
         /*
             Higher-level method that oversees the initialisation
@@ -309,6 +313,8 @@ public class Conquest extends JFrame {
         
         //Move count related buttons are disabled initially
         toggleMoveCountButtonState(false, false);
+        //Disable capture button
+        btnCapture.setEnabled(false);
 
     }
     private void setLabelParameters() {
@@ -342,6 +348,10 @@ public class Conquest extends JFrame {
     }
     
     //Unit management methods
+    private void checkPossibleCapture() {
+        int unitSelected = getSelectedUnit();
+        btnCapture.setEnabled(ConquestMap.findCapturePoint(unitSelected));
+    }
     public static int getSelectedUnit() {
         //Find the current selected unit.
         if (booleanIsPlayer1Turn) {
@@ -382,6 +392,7 @@ public class Conquest extends JFrame {
             if (processMove(1)) {
                 ConquestMap.move(moveDirection);
                 checkPossibleMoveDirections();
+                checkPossibleCapture();
             }
         }
     }
@@ -620,15 +631,15 @@ public class Conquest extends JFrame {
             switch (unitNumber) {
                 case 0:
                     btnSelectUnit1.setEnabled(true);
-                    btnUpgradeUnit1.setEnabled(true);
+                    //btnUpgradeUnit1.setEnabled(true);
                     break;
                 case 1:
                     btnSelectUnit2.setEnabled(true);
-                    btnUpgradeUnit2.setEnabled(true);
+                    //btnUpgradeUnit2.setEnabled(true);
                     break;
                 case 2:
                     btnSelectUnit3.setEnabled(true);
-                    btnUpgradeUnit2.setEnabled(true);
+                    //btnUpgradeUnit3.setEnabled(true);
                     break;
                 default:
                     log("Invalid unit parameter. (disableUnitButtons)");
@@ -639,15 +650,15 @@ public class Conquest extends JFrame {
             switch (unitNumber) {
                 case 3:
                     btnSelectUnit1.setEnabled(true);
-                    btnUpgradeUnit1.setEnabled(true);
+                    //btnUpgradeUnit1.setEnabled(true);
                     break;
                 case 4:
                     btnSelectUnit2.setEnabled(true);
-                    btnUpgradeUnit2.setEnabled(true);
+                    //btnUpgradeUnit2.setEnabled(true);
                     break;
                 case 5:
                     btnSelectUnit3.setEnabled(true);
-                    btnUpgradeUnit2.setEnabled(true);
+                    //btnUpgradeUnit3.setEnabled(true);
                     break;
                 default:
                     log("Invalid unit parameter. (disableUnitButtons)");
@@ -804,6 +815,7 @@ public class Conquest extends JFrame {
         setLblUnitPower();
 
         toggleMoveCountButtonState(false, false); //disable all buttons.
+        booleanDiceRolled = false;
         btnRollDice.setEnabled(true); //enable roll dice button
         checkUnitsKilled(); //check for units that have been killed.
     }
@@ -832,10 +844,7 @@ public class Conquest extends JFrame {
         btnUpgradeUnit2.setEnabled(true);
         btnUpgradeUnit3.setEnabled(true);
         
-        //Check if attack mode is enabled.l
-        if (booleanAttackMode) {
-            attackMode();
-        }
+        booleanDiceRolled = true;
         
         //Check which units are killed
         checkUnitsKilled();
@@ -1032,15 +1041,21 @@ public class Conquest extends JFrame {
     }
     private void btnSelectUnit1Pressed(ActionEvent evt) {
         selectUnit(0);
-        disableAttackMode();
+        if (booleanAttackMode) {
+            disableAttackMode();
+        }
     }
     private void btnSelectUnit2Pressed(ActionEvent evt) {
         selectUnit(1);
-        disableAttackMode();
+        if (booleanAttackMode) {
+            disableAttackMode();
+        }
     }
     private void btnSelectUnit3Pressed(ActionEvent evt) {
         selectUnit(2);
-        disableAttackMode();
+        if (booleanAttackMode) {
+            disableAttackMode();
+        }
     }
     private void btnUpgradeUnit1Pressed(ActionEvent evt) {
         upgradeUnit(1, 1);
@@ -1060,13 +1075,18 @@ public class Conquest extends JFrame {
     private void btnAttackPressed(ActionEvent evt) {
         //Toggle attack mode.
         if (booleanUnitSelected) {
-            if (booleanAttackMode) {
-                booleanAttackMode = false;
-                disableAttackMode();
+            if (booleanDiceRolled) {
+                if (booleanAttackMode) {
+                    booleanAttackMode = false;
+                    disableAttackMode();
+                }
+                else {
+                    booleanAttackMode = true;
+                    attackMode();
+                }
             }
             else {
-                booleanAttackMode = true;
-                attackMode();
+                msgBox("Roll the dice first.", "Dice not rolled", "plain");
             }
         }
         else {
