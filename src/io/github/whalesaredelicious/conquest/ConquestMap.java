@@ -39,6 +39,7 @@ public final class ConquestMap extends JFrame {
     public static int[] intCapturePointA = new int[2], intCapturePointB = new int[2],
             intCapturePointC = new int[2], intCapturePointD = new int[2];
     public static int[][] intCapturePointLocations = new int[4][2];
+    public static int[] intCapturePointStatus = new int[4];
     
     public static boolean[][] booleanGridOccupied = new boolean[18][11];
     public static boolean[][] booleanGridCapturePoints = new boolean[18][11];
@@ -180,6 +181,10 @@ public final class ConquestMap extends JFrame {
             for (int gridY = 0; gridY < booleanGridCapturePoints[gridX].length; gridY++) {
                 booleanGridCapturePoints[gridX][gridY] = false;
             }
+        }
+        //Initialise capture point statuses
+        for (int i = 0; i < intCapturePointStatus.length; i++) {
+            intCapturePointStatus[i] = 0;
         }
         //Set capture point locations
         intCapturePointA[x] = 7; intCapturePointA[y] = 2;

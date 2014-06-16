@@ -173,4 +173,25 @@ public class ConquestCombat {
         }
         return intEnemyFound;
     }
+    public static String getCapturePointID (int unitSelected) {
+        int x = 0, y = 1;
+        String stringCapturePointID = "";
+        
+        int[] intUnitSelectedLocation = new int[2];
+        intUnitSelectedLocation = getUnitCoords(unitSelected);
+        int intLocX = intUnitSelectedLocation[x], intLocY = intUnitSelectedLocation[y];
+        if (intLocX == ConquestMap.intCapturePointA[x] && intLocY == ConquestMap.intCapturePointA[y]) {
+            stringCapturePointID = "A";
+        }
+        else if (intLocX == ConquestMap.intCapturePointB[x] && intLocY == ConquestMap.intCapturePointB[y]) {
+            stringCapturePointID = "B";
+        }
+        else if (intLocX == ConquestMap.intCapturePointC[x] && intLocY == ConquestMap.intCapturePointC[y]) {
+            stringCapturePointID = "C";
+        }
+        else if (intLocX == ConquestMap.intCapturePointD[x] && intLocY == ConquestMap.intCapturePointD[y]) {
+            stringCapturePointID = "D";
+        }
+        return stringCapturePointID;
+    }
 }   

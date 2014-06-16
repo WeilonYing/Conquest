@@ -16,16 +16,22 @@
 
 package io.github.whalesaredelicious.conquest;
 
+import static io.github.whalesaredelicious.conquest.ConquestMap.intCapturePointStatus;
+import static java.awt.Color.blue;
+import static java.awt.Color.lightGray;
+import static java.awt.Color.red;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Logger.getLogger;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.border.Border;
 
 /**
  *
@@ -86,6 +92,14 @@ public class Conquest extends JFrame {
     private final JLabel lblPlayer1 = new JLabel(stringPlayer1, JLabel.CENTER);
     private final JLabel lblPlayer2 = new JLabel(stringPlayer2, JLabel.CENTER);
     private final JLabel lblVs = new JLabel("vs.", JLabel.CENTER);
+    
+    private final JLabel lblCapturePointsTitle = new JLabel("Capture Points");
+    private final JLabel[] lblCapturePoint = new JLabel[4];
+    
+    //Declare borders (for Capture Point labels)
+    private Border borderGrey = BorderFactory.createBevelBorder(1, lightGray, lightGray, lightGray, lightGray); //No man's land
+    private Border borderRed = BorderFactory.createBevelBorder(1, red, red, red, red); //Player 1's land
+    private Border borderBlue = BorderFactory.createBevelBorder(1, blue, blue, blue, blue); //Player 2's land
     
     //Constructor method
     public Conquest() {
@@ -268,6 +282,9 @@ public class Conquest extends JFrame {
         add(lblPlayer1);
         add(lblPlayer2);
         add(lblVs);
+        
+        add(lblCapturePointsTitle);
+        for (int i = 0; i < lblCapturePoint.length; i++) { add(lblCapturePoint[i]); }
     }
     private void initUnitsKilled() {
         /**
@@ -335,8 +352,24 @@ public class Conquest extends JFrame {
         lblPlayer2.setBounds(boundaryX - 250, boundaryY - 300, 150, 30);
         lblVs.setBounds(boundaryX - 350, boundaryY - 300, 30, 30);
         
+        lblCapturePointsTitle.setBounds(boundaryX - 370, boundaryY - 250, 200, 30);
+        
+        //Initialise the CapturePoint label array.
+        for (int i = 0; i < lblCapturePoint.length; i++) { lblCapturePoint[i] = new JLabel("", JLabel.CENTER); }
+        
+        lblCapturePoint[0].setText("A");
+        lblCapturePoint[1].setText("B");
+        lblCapturePoint[2].setText("C");
+        lblCapturePoint[3].setText("D");
+        
+        lblCapturePoint[0].setBounds(boundaryX - 320, boundaryY - 220, 30, 30);
+        lblCapturePoint[1].setBounds(boundaryX - 320, boundaryY - 185, 30, 30);
+        lblCapturePoint[2].setBounds(boundaryX - 320, boundaryY - 150, 30, 30);
+        lblCapturePoint[3].setBounds(boundaryX - 320, boundaryY - 115, 30, 30);
+        
         //Sets the font parameters of the labels. By default it is serif, plain and font size 10
         Font fontStandard = new Font("sans-serif", Font.PLAIN, 16);
+        Font fontBold = new Font("sans-serif", Font.BOLD, 16);
         lblWhoseTurn.setFont(fontStandard);
         lblNumMoves.setFont(fontStandard);
         lblCurrentSelectedUnit.setFont(fontStandard);
@@ -345,6 +378,18 @@ public class Conquest extends JFrame {
         lblPlayer2.setFont(fontStandard);
         lblVs.setFont(fontStandard);
         
+        lblCapturePointsTitle.setFont(fontBold);
+        
+        for (int i = 0; i < lblCapturePoint.length; i++) {
+            lblCapturePoint[i].setFont(fontStandard);
+            lblCapturePoint[i].setHorizontalTextPosition(JLabel.CENTER);
+        }
+        //Set label borders
+        for (int i = 0; i < lblCapturePoint.length; i++) {
+            lblCapturePoint[i].setBorder(borderGrey);
+        }
+        lblPlayer1.setBorder(borderRed);
+        lblPlayer2.setBorder(borderBlue);
     }
     
     //Unit management methods
@@ -584,6 +629,54 @@ public class Conquest extends JFrame {
         log("Attack mode disabled");
         checkUnitsKilled();
     }
+    
+    //Capture Point Management
+    private void processCapture() {
+        int unitSelected = getSelectedUnit();
+        String stringCapturePointID = ConquestCombat.getCapturePointID(unitSelected);
+        changeCapturePoint(stringCapturePointID);
+    }
+    private void changeCapturePoint(String capturePointID) {
+        int captureAlignment = 0;
+        if (booleanIsPlayer1Turn) { //If player 1, captureAlignment = 1, else captureAlignment = 2
+            captureAlignment = 1; //Red team
+        }
+        else {
+            captureAlignment = 2; //Blue team
+        }
+
+        int A = 0, B = 1, C = 2, D = 3; //Capture point ID string to number conversion
+        switch (capturePointID) {
+            case "A":
+                intCapturePointStatus[A] = captureAlignment;
+                lblCapturePoint[A].setBorder(getCapturePointBorder(captureAlignment));
+                break;
+            case "B":
+                intCapturePointStatus[B] = captureAlignment;
+                lblCapturePoint[B].setBorder(getCapturePointBorder(captureAlignment));
+                break;
+            case "C":
+                intCapturePointStatus[C] = captureAlignment;
+                lblCapturePoint[C].setBorder(getCapturePointBorder(captureAlignment));
+                break;
+            case "D":
+                intCapturePointStatus[D] = captureAlignment;
+                lblCapturePoint[D].setBorder(getCapturePointBorder(captureAlignment));
+                break;
+        }
+        //Refresh capture points (Player 1 = Red, Player 2 = Blue
+    }
+    private Border getCapturePointBorder(int captureAlignment) {
+        switch (captureAlignment) {
+            case 1:
+                return borderRed;
+            case 2:
+                return borderBlue;
+            default:
+                return borderGrey;
+        }
+    }
+    
     //GUI management methods
     private void disableUnitButtons(int unitNumber) {
         if (booleanIsPlayer1Turn) {
@@ -1094,7 +1187,7 @@ public class Conquest extends JFrame {
         }
     }
     private void btnCapturePressed(ActionEvent evt) {
-
+        processCapture();
     }
     
     //Auto-generated code below
