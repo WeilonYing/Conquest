@@ -193,11 +193,11 @@ public class ConquestStart extends JDialog {
         stringPlayer2Name = txtfieldPlayer2.getText();
         
         //Check name length
-        if (stringPlayer1Name.length() > 30) {
+        if (stringPlayer1Name.length() > 20) {
             booleanNameCheckFlag = true;
             msgBox("Player 1's name is too long! Maximum 30 characters.", "Warning", "warning");
         }
-        if (stringPlayer2Name.length() > 30) {
+        if (stringPlayer2Name.length() > 20) {
             booleanNameCheckFlag = true;
             msgBox("Player 2's name is too long! Maximum 30 characters.", "Warning", "warning");
         }

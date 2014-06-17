@@ -31,6 +31,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JProgressBar;
 import javax.swing.border.Border;
 
 /**
@@ -51,6 +52,9 @@ public class Conquest extends JFrame {
     public static int intUnit2_1Power = 1;
     public static int intUnit2_2Power = 1;
     public static int intUnit2_3Power = 1;
+    
+    private int intInitialPlayer1Tickets = 50, intInitialPlayer2Tickets = 50;
+    private int intPlayer1Tickets = intInitialPlayer1Tickets, intPlayer2Tickets = intInitialPlayer2Tickets;
     
     private boolean booleanDiceRolled = false;
     public static boolean[] booleanUnitKilled = new boolean[6];
@@ -86,12 +90,15 @@ public class Conquest extends JFrame {
     private final JLabel lblUnit2Power = new JLabel("0");
     private final JLabel lblUnit3Power = new JLabel("0");
     
-    private final JLabel lblWhoseTurn = new JLabel("Turn: " + stringPlayerTurn);
-    private final JLabel lblCurrentSelectedUnit = new JLabel("Current selected unit: None");
-    private final JLabel lblNumMoves = new JLabel("No. of moves left: " + Integer.toString(intNumMoves));
+    private final JLabel lblWhoseTurn = new JLabel("<html><b>Turn: </b>" + stringPlayerTurn + "</html>");
+    private final JLabel lblCurrentSelectedUnit = new JLabel("<html><b>Current selected unit: </b>None</html>");
+    private final JLabel lblNumMoves = new JLabel("<html><b>No. of moves left: </b>" + Integer.toString(intNumMoves) + "</html>");
     private final JLabel lblPlayer1 = new JLabel(stringPlayer1, JLabel.CENTER);
     private final JLabel lblPlayer2 = new JLabel(stringPlayer2, JLabel.CENTER);
     private final JLabel lblVs = new JLabel("vs.", JLabel.CENTER);
+    
+    private final JLabel lblTicketsLeftPlayer1 = new JLabel("<html><b>Tickets left</b></html>", JLabel.CENTER);
+    private final JLabel lblTicketsLeftPlayer2 = new JLabel("<html><b>Tickets left</b></html>", JLabel.CENTER);
     
     private final JLabel lblCapturePointsTitle = new JLabel("Capture Points");
     private final JLabel[] lblCapturePoint = new JLabel[4];
@@ -101,6 +108,11 @@ public class Conquest extends JFrame {
     private Border borderRed = BorderFactory.createBevelBorder(1, red, red, red, red); //Player 1's land
     private Border borderBlue = BorderFactory.createBevelBorder(1, blue, blue, blue, blue); //Player 2's land
     
+    //Declare progress bars (for ticket count)
+    private JProgressBar progressbarPlayer1 = new JProgressBar(0, 100);
+    private JProgressBar progressbarPlayer2 = new JProgressBar(0, 100);
+    private JProgressBar[] progressbarPlayerTickets = new JProgressBar[2];
+    
     //Constructor method
     public Conquest() {
         super("Conquest");
@@ -108,6 +120,7 @@ public class Conquest extends JFrame {
         initComponents();
         initControls();
         initLabels();
+        initProgressBars();
         initUnitsKilled();
         
         setScreenParameters();
@@ -282,6 +295,8 @@ public class Conquest extends JFrame {
         add(lblPlayer1);
         add(lblPlayer2);
         add(lblVs);
+        //add(lblTicketsLeftPlayer1);
+        //add(lblTicketsLeftPlayer2);
         
         add(lblCapturePointsTitle);
         for (int i = 0; i < lblCapturePoint.length; i++) { add(lblCapturePoint[i]); }
@@ -293,6 +308,39 @@ public class Conquest extends JFrame {
         for (int i = 0; i < booleanUnitKilled.length; i++) {
             booleanUnitKilled[i] = false;
         }
+    }
+    private void initProgressBars() {
+        int boundaryX = this.getSize().width, boundaryY = this.getSize().height;
+        int p1 = 0, p2 = 1; //Player numbers
+        progressbarPlayer1.setBounds(boundaryX - 550, boundaryY - 295, 120, 30);
+        progressbarPlayer1.setValue(100);
+        progressbarPlayer1.setForeground(red);
+        progressbarPlayer1.setStringPainted(true);
+        progressbarPlayer1.setString("Tickets left: 50");
+        
+        progressbarPlayer2.setBounds(boundaryX - 220, boundaryY - 295, 120, 20);
+        
+        for (int player = 0; player < progressbarPlayerTickets.length; player++) {
+            progressbarPlayerTickets[player] = new JProgressBar(0, 100);
+            progressbarPlayerTickets[player].setStringPainted(true);
+            progressbarPlayerTickets[player].setValue(100);
+            add(progressbarPlayerTickets[player]);
+        }
+        progressbarPlayerTickets[p1].setBounds(boundaryX - 550, boundaryY - 295, 120, 30);
+        progressbarPlayerTickets[p1].setForeground(red);
+        progressbarPlayerTickets[p1].setString("Tickets left: " + Integer.toString(intPlayer1Tickets));
+        
+        progressbarPlayerTickets[p2].setBounds(boundaryX - 220, boundaryY - 295, 120, 30);
+        progressbarPlayerTickets[p2].setForeground(blue);
+        progressbarPlayerTickets[p2].setString("Tickets left: " + Integer.toString(intPlayer2Tickets));
+        
+        //add(progressbarPlayer1);
+        //add(progressbarPlayer2);
+        /**
+         *  private JProgressBar progressbarPlayer1 = new JProgressBar(0, 100);
+            private JProgressBar progressbarPlayer2 = new JProgressBar(0, 100);
+            private JProgressBar[] progressbarPlayerTickets = new JProgressBar[2];
+         */
     }
     private void setButtonParameters() {
         //Sets the size and location of the buttons.
@@ -334,9 +382,7 @@ public class Conquest extends JFrame {
         btnCapture.setEnabled(false);
 
     }
-    private void setLabelParameters() {
-        //Sets the size and location of the labels.
-        
+    private void setLabelParameters() {//Sets the size and location of the labels.
         //label.setBounds(LocationX, LocationY, SizeX, SizeY
         int boundaryX = this.getSize().width, boundaryY = this.getSize().height;
         
@@ -344,15 +390,19 @@ public class Conquest extends JFrame {
         lblUnit2Power.setBounds(boundaryX - 575, boundaryY - 155, 30, 10);
         lblUnit3Power.setBounds(boundaryX - 575, boundaryY - 105, 30, 10);
         
-        lblWhoseTurn.setBounds(boundaryX - 575, boundaryY - 70, 200, 30);
-        lblNumMoves.setBounds(boundaryX - 575, boundaryY - 40, 200, 30);
-        lblCurrentSelectedUnit.setBounds((boundaryX - 575), (boundaryY - 10), 200, 30);
+        lblWhoseTurn.setBounds(boundaryX - 575, boundaryY - 70, 200, 40);
+        lblNumMoves.setBounds(boundaryX - 575, boundaryY - 40, 200, 40);
+        lblCurrentSelectedUnit.setBounds((boundaryX - 575), (boundaryY - 10), 200, 40);
         
-        lblPlayer1.setBounds(boundaryX - 550, boundaryY - 300, 150, 30);
-        lblPlayer2.setBounds(boundaryX - 250, boundaryY - 300, 150, 30);
-        lblVs.setBounds(boundaryX - 350, boundaryY - 300, 30, 30);
+        lblPlayer1.setBounds(boundaryX - 580, boundaryY - 330, 180, 30);
+        lblPlayer2.setBounds(boundaryX - 250, boundaryY - 330, 180, 30);
+        lblVs.setBounds(boundaryX - 340, boundaryY - 320, 30, 30);
+        lblTicketsLeftPlayer1.setBounds(boundaryX - 570, boundaryY - 275, 150, 30);
+        lblTicketsLeftPlayer1.setText("<html><b>Tickets left: </b>" + Integer.toString(intPlayer1Tickets) + "</html>");
+        lblTicketsLeftPlayer2.setBounds(boundaryX - 240, boundaryY - 275, 150, 30);
+        lblTicketsLeftPlayer2.setText("<html><b>Tickets left: </b>" + Integer.toString(intPlayer2Tickets) + "</html>");
         
-        lblCapturePointsTitle.setBounds(boundaryX - 370, boundaryY - 250, 200, 30);
+        lblCapturePointsTitle.setBounds(boundaryX - 360, boundaryY - 260, 200, 30);
         
         //Initialise the CapturePoint label array.
         for (int i = 0; i < lblCapturePoint.length; i++) { lblCapturePoint[i] = new JLabel("", JLabel.CENTER); }
@@ -362,23 +412,27 @@ public class Conquest extends JFrame {
         lblCapturePoint[2].setText("C");
         lblCapturePoint[3].setText("D");
         
-        lblCapturePoint[0].setBounds(boundaryX - 320, boundaryY - 220, 30, 30);
-        lblCapturePoint[1].setBounds(boundaryX - 320, boundaryY - 185, 30, 30);
-        lblCapturePoint[2].setBounds(boundaryX - 320, boundaryY - 150, 30, 30);
-        lblCapturePoint[3].setBounds(boundaryX - 320, boundaryY - 115, 30, 30);
+        lblCapturePoint[0].setBounds(boundaryX - 320, boundaryY - 210, 30, 30);
+        lblCapturePoint[1].setBounds(boundaryX - 320, boundaryY - 175, 30, 30);
+        lblCapturePoint[2].setBounds(boundaryX - 320, boundaryY - 140, 30, 30);
+        lblCapturePoint[3].setBounds(boundaryX - 320, boundaryY - 105, 30, 30);
         
         //Sets the font parameters of the labels. By default it is serif, plain and font size 10
         Font fontStandard = new Font("sans-serif", Font.PLAIN, 16);
         Font fontBold = new Font("sans-serif", Font.BOLD, 16);
-        lblWhoseTurn.setFont(fontStandard);
-        lblNumMoves.setFont(fontStandard);
-        lblCurrentSelectedUnit.setFont(fontStandard);
+        Font fontSmall = new Font("sans-serif", Font.PLAIN, 14);
+        Font fontSmallBold = new Font("sans-serif", Font.BOLD, 14);
+        lblWhoseTurn.setFont(fontSmall);
+        lblNumMoves.setFont(fontSmall);
+        lblCurrentSelectedUnit.setFont(fontSmall);
         
         lblPlayer1.setFont(fontStandard);
         lblPlayer2.setFont(fontStandard);
         lblVs.setFont(fontStandard);
+        lblTicketsLeftPlayer1.setFont(fontSmall);
+        lblTicketsLeftPlayer2.setFont(fontSmall);
         
-        lblCapturePointsTitle.setFont(fontBold);
+        lblCapturePointsTitle.setFont(fontSmallBold);
         
         for (int i = 0; i < lblCapturePoint.length; i++) {
             lblCapturePoint[i].setFont(fontStandard);
@@ -794,7 +848,7 @@ public class Conquest extends JFrame {
         }
     }
     private void setNumTurnsLabel (int num) {
-        lblNumMoves.setText("No. of moves left: " + Integer.toString(num));
+        lblNumMoves.setText("<html><b>No. of moves left: </b>" + Integer.toString(num) + "</html>");
     }
     private void setLblUnitPower() {
         if (booleanIsPlayer1Turn) {
@@ -869,7 +923,7 @@ public class Conquest extends JFrame {
             checkPossibleMoveDirections();
             booleanUnitSelected = true;
         }
-        lblCurrentSelectedUnit.setText("Current selected unit: " + Integer.toString(unitNumber + 1));
+        lblCurrentSelectedUnit.setText("<html><b>Current selected unit: </b>" + Integer.toString(unitNumber + 1) + "</html>");
         checkUnitsKilled(); //Check which units are killed so that they cannot be selected/upgraded.
     }
     private void changeTurn() {
@@ -885,7 +939,7 @@ public class Conquest extends JFrame {
             booleanIsPlayer1Turn = true;
             stringPlayerTurn = stringPlayer1;
         }
-        lblWhoseTurn.setText("Turn: " + stringPlayerTurn);
+        lblWhoseTurn.setText("<html><b>Turn: </b>" + stringPlayerTurn + "</html>");
         
         //Reset selected units
         for (int i = 0; i < booleanPlayer1UnitSelected.length; i++) {
@@ -898,7 +952,7 @@ public class Conquest extends JFrame {
         //Set unit selected to false.
         
         booleanUnitSelected = false;
-        lblCurrentSelectedUnit.setText("Current selected unit: None");
+        lblCurrentSelectedUnit.setText("<html><b>Current selected unit:</b> None</html>");
         
         //Reset number of moves left
         intNumMoves = 0;
@@ -911,6 +965,9 @@ public class Conquest extends JFrame {
         booleanDiceRolled = false;
         btnRollDice.setEnabled(true); //enable roll dice button
         checkUnitsKilled(); //check for units that have been killed.
+        
+        //Subtract tickets
+        ticketBleed();
     }
     private void rollDice() { //Generate a random integer between 1-6
         intNumMoves = (RandomIntGenerator(1, 6));
@@ -941,6 +998,47 @@ public class Conquest extends JFrame {
         
         //Check which units are killed
         checkUnitsKilled();
+    }
+    private void ticketBleed() {
+        int intPlayer1Subtract = 0, intPlayer2Subtract = 0;
+        for (int i = 0; i < intCapturePointStatus.length; i++) {
+            switch (intCapturePointStatus[i]) {
+                case 1:
+                    intPlayer2Subtract++;
+                    break;
+                case 2:
+                    intPlayer1Subtract++;
+                    break;
+                default:
+                    break;
+            }
+        }
+        intPlayer1Tickets -= intPlayer1Subtract;
+        intPlayer2Tickets -= intPlayer2Subtract;
+        
+        updateProgressBars();
+        
+        if (intPlayer1Tickets <= 0 || intPlayer2Tickets <= 0) {
+            if (intPlayer1Tickets > intPlayer2Tickets && intPlayer1Tickets > 0) {
+                msgBox(stringPlayer1 + " wins the game!", "Game Over!", "plain");
+            }
+            else if (intPlayer2Tickets > intPlayer1Tickets && intPlayer2Tickets > 0) {
+                msgBox(stringPlayer2 + " wins the game!", "Game Over!", "plain");
+            }
+            else {
+                msgBox("Both players lost all their tickets at the same time! It's a draw!", "Game Over!", "plain");
+            }
+            //TO DO: Scoresheet
+        }
+    }
+    private void updateProgressBars() {
+        int p1 = 0, p2 = 1; //Player numbers
+        int p1Progress = (int)Math.round((intPlayer1Tickets/intInitialPlayer1Tickets) * 100);
+        int p2Progress = (int)Math.round((intPlayer2Tickets/intInitialPlayer2Tickets) * 100);
+        progressbarPlayerTickets[p1].setValue(p1Progress);
+        progressbarPlayerTickets[p1].setString("Tickets left: " + Integer.toString(intPlayer1Tickets));
+        progressbarPlayerTickets[p2].setValue(p2Progress);
+        progressbarPlayerTickets[p2].setString("Tickets left: " + Integer.toString(intPlayer2Tickets));
     }
     
     //General purpose methods
