@@ -24,6 +24,7 @@ import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import static java.lang.System.out;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Logger.getLogger;
 import javax.swing.BorderFactory;
@@ -113,6 +114,7 @@ public class Conquest extends JFrame {
     private JProgressBar progressbarPlayer2 = new JProgressBar(0, 100);
     private JProgressBar[] progressbarPlayerTickets = new JProgressBar[2];
     
+    static ConquestMap conquestmap = new ConquestMap();
     //Constructor method
     public Conquest() {
         super("Conquest");
@@ -146,18 +148,13 @@ public class Conquest extends JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                ConquestStart start = new ConquestStart(null, true);
-                start.setVisible(true);
-                
-                new Conquest().setVisible(true);
-                
-                ConquestMap conquestmap = new ConquestMap();
-                conquestmap.setVisible(true);
-                conquestmap.initLocations();
-            }
-        });
+        ConquestStart start = new ConquestStart(null, true);
+        start.setVisible(true);
+
+        new Conquest().setVisible(true);
+
+        conquestmap.setVisible(true);
+        conquestmap.initLocations();
     }
     
     //Initialisation methods - setting up GUI elements
@@ -171,7 +168,7 @@ public class Conquest extends JFrame {
     }
     private void initControls() {
         /*
-            Higher-level method that oversees the initialisation
+            Higher-level method that oversees the initialisation,
             setting parameters, creating ActionListeners and
             finally adding controls to the window.
         */
@@ -199,6 +196,7 @@ public class Conquest extends JFrame {
         
         add(btnAttack);
         add(btnCapture);
+        
     }
     private void initActionListeners() { //Create ActionListeners
         /*
@@ -352,7 +350,7 @@ public class Conquest extends JFrame {
         btnMoveDown.setBounds((boundaryX - 160), (boundaryY - 140), 60, 60);
         btnMoveLeft.setBounds((boundaryX - 220), (boundaryY - 190), 60, 60);
         btnMoveRight.setBounds((boundaryX - 100), (boundaryY - 190), 60, 60);
-
+        
         btnSelectUnit1.setBounds((boundaryX - 550), (boundaryY - 220), 100, 40);
         btnSelectUnit2.setBounds((boundaryX - 550), (boundaryY - 170), 100, 40);
         btnSelectUnit3.setBounds((boundaryX - 550), (boundaryY - 120), 100, 40);
@@ -541,17 +539,18 @@ public class Conquest extends JFrame {
          * If player somehow reaches a ridiculous amount of power,
          * limit power to 9001 to prevent graphical glitches in the GUI.
          */
-        if (intUnit1_1Power > 9001) {intUnit1_1Power = 9001;}
-        if (intUnit1_2Power > 9001) {intUnit1_2Power = 9001;}
-        if (intUnit1_3Power > 9001) {intUnit1_3Power = 9001;}
-        if (intUnit2_1Power > 9001) {intUnit2_1Power = 9001;}
-        if (intUnit2_2Power > 9001) {intUnit2_2Power = 9001;}
-        if (intUnit2_3Power > 9001) {intUnit2_3Power = 9001;}
+        int maxPower = 9001;
+        if (intUnit1_1Power > maxPower) {intUnit1_1Power = maxPower;}
+        if (intUnit1_2Power > maxPower) {intUnit1_2Power = maxPower;}
+        if (intUnit1_3Power > maxPower) {intUnit1_3Power = maxPower;}
+        if (intUnit2_1Power > maxPower) {intUnit2_1Power = maxPower;}
+        if (intUnit2_2Power > maxPower) {intUnit2_2Power = maxPower;}
+        if (intUnit2_3Power > maxPower) {intUnit2_3Power = maxPower;}
     }
     private void attackMode() {
         //Standard procedure to scan for enemy units. Called everytime something is changed and if Attack Mode is enabled.
         int unitSelected = getSelectedUnit(); //If getSelectedUnit() returns 999, no unit selected.
-        if (getSelectedUnit() != 999) {
+        if (unitSelected  != 999) {
             boolean[] booleanAttackPossibility = new boolean[4];
         
             booleanAttackPossibility = ConquestCombat.checkAttackPossibility(unitSelected); //check possible places to attack
@@ -564,7 +563,7 @@ public class Conquest extends JFrame {
         }
         checkUnitsKilled();
     }
-    private void attackUnit(int direction) {
+    private void attackUnit(int direction) { //Attack a unit if attack mode is enabled.
         int unitSelected = getSelectedUnit(); //If getSelectedUnit returns 999, no unit selected.
         int[] unitSelectedCoords = ConquestCombat.getUnitCoords(unitSelected);
         if (!booleanUnitSelected || unitSelected == 999) { //If booleanUnitSelected = false or unitSelected = 999
@@ -594,20 +593,16 @@ public class Conquest extends JFrame {
             }
             
             if (defendingUnit == 999) { //If sentinel value is returned, then cancel attack.
-                msgBox("No enemy found in the chosen direction (attackUnit)", "No enemy found", "plain");
-                disableAttackMode();
+                msgBox("No enemy found in the chosen direction", "No enemy found", "plain");
             }
             else {
-                int[] defendingUnitCoords = ConquestCombat.getUnitCoords(unitSelected);
-                log("Defending unit found:" + Integer.toString(defendingUnit));
-                //To do, use direction
-                
                 unitBattle(unitSelected, defendingUnit, direction);
             }
-            disableAttackMode(); //Disable attack mode after battle is completed.
         }
+        disableAttackMode(); //Disable attack mode after battle is completed.
     }
     private void unitBattle(int attackingUnit, int defendingUnit, int direction) {
+        //Calculates unit power levels and kills the losing units.
         int attackingUnitPower = getUnitPower(attackingUnit);
         int defendingUnitPower = getUnitPower(defendingUnit);
         
@@ -627,7 +622,7 @@ public class Conquest extends JFrame {
             killUnit(defendingUnit);
             killUnit(attackingUnit);
             booleanUnitSelected = false; //Unit can no longer be selected since it is killed.
-            System.out.println("Kill both units: " + attackingUnit + ", " + defendingUnit);
+            out.println("Kill both units: " + attackingUnit + ", " + defendingUnit);
         }
         checkUnitsKilled();
     }
@@ -648,6 +643,7 @@ public class Conquest extends JFrame {
         log("Unit " + Integer.toString(unitNumber) + " has been killed.");
     }
     private int getUnitPower(int unitNumber) {
+        //Finds the power level of a unit and returns the value as an integer.
         int power = 0;
         switch (unitNumber) {
             case 0:
@@ -691,6 +687,7 @@ public class Conquest extends JFrame {
         changeCapturePoint(stringCapturePointID);
     }
     private void changeCapturePoint(String capturePointID) {
+        //Changes capture point ownership status to the desired team.
         int captureAlignment = 0;
         if (booleanIsPlayer1Turn) { //If player 1, captureAlignment = 1, else captureAlignment = 2
             captureAlignment = 1; //Red team
@@ -721,6 +718,7 @@ public class Conquest extends JFrame {
         //Refresh capture points (Player 1 = Red, Player 2 = Blue
     }
     private Border getCapturePointBorder(int captureAlignment) {
+        //Simple method to return border information (visual decoration)
         switch (captureAlignment) {
             case 1:
                 return borderRed;
@@ -733,6 +731,7 @@ public class Conquest extends JFrame {
     
     //GUI management methods
     private void disableUnitButtons(int unitNumber) {
+        //Disables unit control buttons, depending on set parameter
         if (booleanIsPlayer1Turn) {
             switch (unitNumber) {
                 case 0:
@@ -745,7 +744,7 @@ public class Conquest extends JFrame {
                     break;
                 case 2:
                     btnSelectUnit3.setEnabled(false);
-                    btnUpgradeUnit2.setEnabled(false);
+                    btnUpgradeUnit3.setEnabled(false);
                     break;
                 default:
                     log("Invalid unit parameter. (disableUnitButtons)");
@@ -764,7 +763,7 @@ public class Conquest extends JFrame {
                     break;
                 case 5:
                     btnSelectUnit3.setEnabled(false);
-                    btnUpgradeUnit2.setEnabled(false);
+                    btnUpgradeUnit3.setEnabled(false);
                     break;
                 default:
                     log("Invalid unit parameter. (disableUnitButtons)");
@@ -774,7 +773,9 @@ public class Conquest extends JFrame {
         log("Disable unit buttons called");
     }
     private void enableUnitButtons(int unitNumber) {
-         if (booleanIsPlayer1Turn) {
+        //Enables unit control buttons, depending on set parameter
+        //NOTE: upgrade unit button is done through disableAttackMode(), which this method is called from.
+        if (booleanIsPlayer1Turn) {
             switch (unitNumber) {
                 case 0:
                     btnSelectUnit1.setEnabled(true);
@@ -824,26 +825,13 @@ public class Conquest extends JFrame {
         }
         if (booleanPossibleAttack) {
             toggleMoveCountButtonState(false, false);
-
-            if (booleanAttackPossibility[0]) {
-                btnMoveUp.setEnabled(true);
-            }
-            if (booleanAttackPossibility[1]) {
-                btnMoveRight.setEnabled(true);
-            }
-            if (booleanAttackPossibility[2]) {
-                btnMoveDown.setEnabled(true);
-            }
-            if (booleanAttackPossibility[3]) {
-                btnMoveLeft.setEnabled(true);
-            }
             btnMoveUp.setEnabled(booleanAttackPossibility[0]);
             btnMoveRight.setEnabled(booleanAttackPossibility[1]);
             btnMoveDown.setEnabled(booleanAttackPossibility[2]);
             btnMoveLeft.setEnabled(booleanAttackPossibility[3]);
         }
         else {
-            booleanAttackMode = false;
+            disableAttackMode();
             msgBox("There are no enemies near your selected unit.", "No enemy units found", "plain");
         }
     }
@@ -863,7 +851,7 @@ public class Conquest extends JFrame {
         }
     }
     private void toggleMoveCountButtonState(boolean moveState, boolean upgradeState) {
-        //Greys out or re-enables the move buttons depending on its set parameter.
+        //Greys out (disables) or re-enables the move and upgrade buttons depending on its set parameters.
         btnMoveUp.setEnabled(moveState);
         btnMoveDown.setEnabled(moveState);
         btnMoveLeft.setEnabled(moveState);
@@ -875,10 +863,15 @@ public class Conquest extends JFrame {
         log("Move count buttons toggled");
     }
     private void checkPossibleMoveDirections() {
+        //Checks which squares around the current selected unit is vacant, and enables the corresponding move buttons.
+        
         //1 = up, 2 = right, 3 = down, 4 = left
         //Ensures buttons aren't set enabled if user doesn't have any moves left anyway.
         if (intNumMoves > 0) {
             toggleMoveCountButtonState(true, true);
+        }
+        else {
+            toggleMoveCountButtonState(false, false);
         }
         //Initialise unitSelected variable.
         int unitSelected = getSelectedUnit(); //NOTE: If no unit selected, returns 999
@@ -886,7 +879,7 @@ public class Conquest extends JFrame {
         if (unitSelected != 999) {
             setBorders(unitSelected);
             boolean[] booleanButtonGreyOut = new boolean[4];
-            System.out.println("Unit Selected: " + unitSelected);
+            out.println("Unit Selected: " + unitSelected);
             booleanButtonGreyOut = ConquestMap.checkGridOccupied(unitSelected);
             if (booleanButtonGreyOut[0]) {
                 btnMoveUp.setEnabled(false);
@@ -902,180 +895,9 @@ public class Conquest extends JFrame {
             }
         }
     }
-    //Player management methods
-    private void selectUnit(int unitNumber) {
-        //Select a unit by setting the appropriate array index to true and all others false.
-        if (booleanIsPlayer1Turn) {
-            for (int i = 0; i < booleanPlayer1UnitSelected.length; i++) {
-                //Deselect all units before selecting the unit specified
-                booleanPlayer1UnitSelected[i] = false;
-            }
-            booleanPlayer1UnitSelected[unitNumber] = true;
-            checkPossibleMoveDirections();
-            
-            booleanUnitSelected = true;
-        }
-        else {
-            for (int i = 0; i < booleanPlayer2UnitSelected.length; i++) {
-                booleanPlayer2UnitSelected[i] = false;
-            }
-            booleanPlayer2UnitSelected[unitNumber] = true;
-            checkPossibleMoveDirections();
-            booleanUnitSelected = true;
-        }
-        lblCurrentSelectedUnit.setText("<html><b>Current selected unit: </b>" + Integer.toString(unitNumber + 1) + "</html>");
-        checkUnitsKilled(); //Check which units are killed so that they cannot be selected/upgraded.
-    }
-    private void changeTurn() {
-        //Disable Attack Mode if still running so that Player 2 does not automatically enter Attack Mode.
-        disableAttackMode();
-        
-        //Switch turn
-        if (booleanIsPlayer1Turn) {
-            booleanIsPlayer1Turn = false;
-            stringPlayerTurn = stringPlayer2;
-        }
-        else {
-            booleanIsPlayer1Turn = true;
-            stringPlayerTurn = stringPlayer1;
-        }
-        lblWhoseTurn.setText("<html><b>Turn: </b>" + stringPlayerTurn + "</html>");
-        
-        //Reset selected units
-        for (int i = 0; i < booleanPlayer1UnitSelected.length; i++) {
-            booleanPlayer1UnitSelected[i] = false;
-        }
-        for (int i = 0; i < booleanPlayer2UnitSelected.length; i++) {
-            booleanPlayer2UnitSelected[i] = false;
-        }
-        
-        //Set unit selected to false.
-        
-        booleanUnitSelected = false;
-        lblCurrentSelectedUnit.setText("<html><b>Current selected unit:</b> None</html>");
-        
-        //Reset number of moves left
-        intNumMoves = 0;
-        setNumTurnsLabel(intNumMoves);
-        
-        //Display unit powers
-        setLblUnitPower();
-
-        toggleMoveCountButtonState(false, false); //disable all buttons.
-        booleanDiceRolled = false;
-        btnRollDice.setEnabled(true); //enable roll dice button
-        checkUnitsKilled(); //check for units that have been killed.
-        
-        //Subtract tickets
-        ticketBleed();
-    }
-    private void rollDice() { //Generate a random integer between 1-6
-        intNumMoves = (RandomIntGenerator(1, 6));
-        intNumMoves = 100;
-        setNumTurnsLabel(intNumMoves);
-        
-        //Re-enable the buttons
-        toggleMoveCountButtonState(true, true);
-        
-        
-        //Disable the Roll Dice button after use.
-        btnRollDice.setEnabled(false);
-        
-        //Check possible move directions if unit is already selected.
-        if (booleanUnitSelected) {
-            checkPossibleMoveDirections();
-        }
-        else {
-            toggleMoveCountButtonState(false, false);
-        }
-        
-        //Re-enable upgrade buttons
-        btnUpgradeUnit1.setEnabled(true);
-        btnUpgradeUnit2.setEnabled(true);
-        btnUpgradeUnit3.setEnabled(true);
-        
-        booleanDiceRolled = true;
-        
-        //Check which units are killed
-        checkUnitsKilled();
-    }
-    private void ticketBleed() {
-        int intPlayer1Subtract = 0, intPlayer2Subtract = 0;
-        for (int i = 0; i < intCapturePointStatus.length; i++) {
-            switch (intCapturePointStatus[i]) {
-                case 1:
-                    intPlayer2Subtract++;
-                    break;
-                case 2:
-                    intPlayer1Subtract++;
-                    break;
-                default:
-                    break;
-            }
-        }
-        intPlayer1Tickets -= intPlayer1Subtract;
-        intPlayer2Tickets -= intPlayer2Subtract;
-        
-        updateProgressBars();
-        
-        if (intPlayer1Tickets <= 0 || intPlayer2Tickets <= 0) {
-            if (intPlayer1Tickets > intPlayer2Tickets && intPlayer1Tickets > 0) {
-                msgBox(stringPlayer1 + " wins the game!", "Game Over!", "plain");
-            }
-            else if (intPlayer2Tickets > intPlayer1Tickets && intPlayer2Tickets > 0) {
-                msgBox(stringPlayer2 + " wins the game!", "Game Over!", "plain");
-            }
-            else {
-                msgBox("Both players lost all their tickets at the same time! It's a draw!", "Game Over!", "plain");
-            }
-            //TO DO: Scoresheet
-        }
-    }
-    private void updateProgressBars() {
-        int p1 = 0, p2 = 1; //Player numbers
-        int p1Progress = (int)Math.round((intPlayer1Tickets/intInitialPlayer1Tickets) * 100);
-        int p2Progress = (int)Math.round((intPlayer2Tickets/intInitialPlayer2Tickets) * 100);
-        progressbarPlayerTickets[p1].setValue(p1Progress);
-        progressbarPlayerTickets[p1].setString("Tickets left: " + Integer.toString(intPlayer1Tickets));
-        progressbarPlayerTickets[p2].setValue(p2Progress);
-        progressbarPlayerTickets[p2].setString("Tickets left: " + Integer.toString(intPlayer2Tickets));
-    }
-    
-    //General purpose methods
-    private static void log(String message) { //Log method - not necessary, but makes typing out code for printing to console easier.
-        System.out.println(message);
-    }
-    private int RandomIntGenerator(int minvalue, int maxvalue) { //Generates a random integer between a set minimum and maximum value
-        int number = (minvalue + (int)(Math.random() * ((maxvalue - minvalue) + 1)));
-        return number;
-    }
-    private void msgBox(String message, String title, String messageType) { //Method to make sending of message dialog boxes to the user easier to do.
-        if (messageType == null) { //If programmer is uninterested in looking up dialog box types, just use null.
-            JOptionPane.showMessageDialog(this, message, title, JOptionPane.PLAIN_MESSAGE);
-        }
-        else {
-            messageType = messageType.toLowerCase(); //Ensures strings with capitalised letters do not get misinterpreted.
-            switch (messageType) { //Use of simple keywords in order to make dialog box creation easier and less tedious.
-                case "info": //Information message dialog box
-                    JOptionPane.showMessageDialog(this, message, title, JOptionPane.INFORMATION_MESSAGE);
-                    break;
-                case "warning": //Warning message dialog box
-                    JOptionPane.showMessageDialog(this, message, title, JOptionPane.WARNING_MESSAGE);
-                    break;
-                case "error": //Error message dialog box
-                    JOptionPane.showMessageDialog(this, message, title, JOptionPane.ERROR_MESSAGE);
-                    break;
-                case "plain": //Plain message dialog box
-                    JOptionPane.showMessageDialog(this, message, title, JOptionPane.PLAIN_MESSAGE);
-                    break;
-                default: //If messageType is not any of the above, default to plain message.
-                    log("messageType string value: " + messageType + " could not be recognised. Defaulting to plain message."); //Inform programmer of this.
-                    JOptionPane.showMessageDialog(this, message, title, JOptionPane.PLAIN_MESSAGE);
-                    break;
-            }
-        }
-    }
     public void setBorders(int unitSelected) {
+        //Ensures units are unable to leave the game map.
+        
         //Switch statement finds the appropriate unit and its location on the grid.
         int x = 0, y = 1; //Coordinate axes
         int gridX = 0, gridY = 0;
@@ -1204,6 +1026,185 @@ public class Conquest extends JFrame {
                 break;
         }
     }
+    //Player management methods
+    private void selectUnit(int unitNumber) {
+        //Processes unit selection. 
+        
+        //Select a unit by setting the appropriate array index to true and all others false.
+        if (booleanIsPlayer1Turn) {
+            for (int i = 0; i < booleanPlayer1UnitSelected.length; i++) {
+                //Deselect all units before selecting the unit specified
+                booleanPlayer1UnitSelected[i] = false;
+            }
+            booleanPlayer1UnitSelected[unitNumber] = true;
+            checkPossibleMoveDirections();
+            
+            booleanUnitSelected = true;
+        }
+        else {
+            for (int i = 0; i < booleanPlayer2UnitSelected.length; i++) {
+                booleanPlayer2UnitSelected[i] = false;
+            }
+            booleanPlayer2UnitSelected[unitNumber] = true;
+            checkPossibleMoveDirections();
+            booleanUnitSelected = true;
+        }
+        lblCurrentSelectedUnit.setText("<html><b>Current selected unit: </b>" + Integer.toString(unitNumber + 1) + "</html>");
+        checkUnitsKilled(); //Check which units are killed so that they cannot be selected/upgraded.
+    }
+    private void changeTurn() {
+        //Processes switching the turn from a player to the other player.
+        
+        //Disable Attack Mode if still running so that Player 2 does not automatically enter Attack Mode.
+        disableAttackMode();
+        
+        //Switch turn
+        if (booleanIsPlayer1Turn) {
+            booleanIsPlayer1Turn = false;
+            stringPlayerTurn = stringPlayer2;
+        }
+        else {
+            booleanIsPlayer1Turn = true;
+            stringPlayerTurn = stringPlayer1;
+        }
+        lblWhoseTurn.setText("<html><b>Turn: </b>" + stringPlayerTurn + "</html>");
+        
+        //Reset selected units
+        for (int i = 0; i < booleanPlayer1UnitSelected.length; i++) {
+            booleanPlayer1UnitSelected[i] = false;
+        }
+        for (int i = 0; i < booleanPlayer2UnitSelected.length; i++) {
+            booleanPlayer2UnitSelected[i] = false;
+        }
+        
+        //Set unit selected to false.
+        
+        booleanUnitSelected = false;
+        lblCurrentSelectedUnit.setText("<html><b>Current selected unit:</b> None</html>");
+        
+        //Reset number of moves left
+        intNumMoves = 0;
+        setNumTurnsLabel(intNumMoves);
+        
+        //Display unit powers
+        setLblUnitPower();
+
+        toggleMoveCountButtonState(false, false); //disable all buttons.
+        booleanDiceRolled = false;
+        btnRollDice.setEnabled(true); //enable roll dice button
+        checkUnitsKilled(); //check for units that have been killed.
+        
+        //Subtract tickets
+        ticketBleed();
+    }
+    private void rollDice() { //Generate a random integer between 1-6
+        intNumMoves = (RandomIntGenerator(1, 6));
+        intNumMoves = 100;
+        setNumTurnsLabel(intNumMoves);
+        
+        //Re-enable the buttons
+        toggleMoveCountButtonState(true, true);
+
+        //Disable the Roll Dice button after use.
+        btnRollDice.setEnabled(false);
+        
+        //Check possible move directions if unit is already selected.
+        if (booleanUnitSelected) {
+            checkPossibleMoveDirections();
+        }
+        else {
+            toggleMoveCountButtonState(false, true);
+        }
+        booleanDiceRolled = true;
+        
+        //Check which units are killed
+        checkUnitsKilled();
+    }
+    private void ticketBleed() {
+        //Subtracts a player's ticket amount depending on how many capture points the other player controls.
+        int intPlayer1Subtract = 0, intPlayer2Subtract = 0; //Set subtract value to zero before running.
+        for (int i = 0; i < intCapturePointStatus.length; i++) {
+            switch (intCapturePointStatus[i]) {
+                case 1: //If capture point belongs to Player 1, subtract ticket from player 2
+                    intPlayer2Subtract++;
+                    break;
+                case 2: //If capture point belongs to Player 2, subtract ticket from player 1
+                    intPlayer1Subtract++;
+                    break;
+                default:
+                    break;
+            }
+        }
+        intPlayer1Tickets -= intPlayer1Subtract;
+        intPlayer2Tickets -= intPlayer2Subtract;
+        
+        updateProgressBars();
+        
+        //Check if a player has lost all tickets.
+        if (intPlayer1Tickets <= 0 || intPlayer2Tickets <= 0) {
+            if (intPlayer1Tickets > intPlayer2Tickets && intPlayer1Tickets > 0) {
+                msgBox(stringPlayer1 + " wins the game!", "Game Over!", "plain");
+                processWin(1);
+            }
+            else if (intPlayer2Tickets > intPlayer1Tickets && intPlayer2Tickets > 0) {
+                msgBox(stringPlayer2 + " wins the game!", "Game Over!", "plain");
+                processWin(2);
+            }
+            else {
+                msgBox("Both players lost all their tickets at the same time! It's a draw!", "Game Over!", "plain");
+                processWin(0);
+            }
+            //TO DO: Scoresheet
+        }
+    }
+    private void processWin(int winner) {
+        
+    }
+    private void updateProgressBars() { //Update the progress bars to the new values.
+        int p1 = 0, p2 = 1; //Player numbers
+        double p1Progress = (intPlayer1Tickets/intInitialPlayer1Tickets) * 100;
+        double p2Progress = (intPlayer2Tickets/intInitialPlayer2Tickets) * 100;
+        log("Player 1 Tickets left: " + Double.toString(p1Progress));
+        progressbarPlayerTickets[p1].setValue((int) p1Progress);
+        progressbarPlayerTickets[p1].setString("Tickets left: " + Integer.toString(intPlayer1Tickets));
+        progressbarPlayerTickets[p2].setValue((int) p2Progress);
+        progressbarPlayerTickets[p2].setString("Tickets left: " + Integer.toString(intPlayer2Tickets));
+    }
+    
+    //General purpose methods
+    private static void log(String message) { //Log method - not necessary, but makes typing out code for printing to console easier.
+        out.println(message);
+    }
+    private int RandomIntGenerator(int minvalue, int maxvalue) { //Generates a random integer between a set minimum and maximum value
+        int number = (minvalue + (int)(Math.random() * ((maxvalue - minvalue) + 1)));
+        return number;
+    }
+    private void msgBox(String message, String title, String messageType) { //Method to make sending of message dialog boxes to the user easier to do.
+        if (messageType == null) { //If programmer is uninterested in looking up dialog box types, just use null.
+            JOptionPane.showMessageDialog(this, message, title, JOptionPane.PLAIN_MESSAGE);
+        }
+        else {
+            messageType = messageType.toLowerCase(); //Ensures strings with capitalised letters do not get misinterpreted.
+            switch (messageType) { //Use of simple keywords in order to make dialog box creation easier and less tedious.
+                case "info": //Information message dialog box
+                    JOptionPane.showMessageDialog(this, message, title, JOptionPane.INFORMATION_MESSAGE);
+                    break;
+                case "warning": //Warning message dialog box
+                    JOptionPane.showMessageDialog(this, message, title, JOptionPane.WARNING_MESSAGE);
+                    break;
+                case "error": //Error message dialog box
+                    JOptionPane.showMessageDialog(this, message, title, JOptionPane.ERROR_MESSAGE);
+                    break;
+                case "plain": //Plain message dialog box
+                    JOptionPane.showMessageDialog(this, message, title, JOptionPane.PLAIN_MESSAGE);
+                    break;
+                default: //If messageType is not any of the above, default to plain message.
+                    log("messageType string value: " + messageType + " could not be recognised. Defaulting to plain message."); //Inform programmer of this.
+                    JOptionPane.showMessageDialog(this, message, title, JOptionPane.PLAIN_MESSAGE);
+                    break;
+            }
+        }
+    }
     
     //ActionEvent Responders - event driven methods for responding to button presses
     private void btnMoveUpPressed(ActionEvent evt) {
@@ -1298,22 +1299,54 @@ public class Conquest extends JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        btnPlayer1Wins = new javax.swing.JButton();
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        btnPlayer1Wins.setText("Player 1 wins");
+        btnPlayer1Wins.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPlayer1WinsActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 600, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(328, Short.MAX_VALUE)
+                .addComponent(btnPlayer1Wins)
+                .addGap(177, 177, 177))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(76, 76, 76)
+                .addComponent(btnPlayer1Wins)
+                .addContainerGap(201, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnPlayer1WinsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPlayer1WinsActionPerformed
+        btnEndTurn.setEnabled(false);
+        btnRollDice.setEnabled(false);
+        toggleMoveCountButtonState(false, false);
+        btnSelectUnit1.setEnabled(false);
+        btnSelectUnit2.setEnabled(false);
+        btnSelectUnit3.setEnabled(false);
+        btnAttack.setEnabled(false);
+        this.setAlwaysOnTop(false);
+        this.dispose();
+        
+        ConquestScoresheet conquestscoresheet = new ConquestScoresheet();
+        conquestscoresheet.setVisible(true);
+        conquestscoresheet.setWinner(1, stringPlayer1, stringPlayer2, intPlayer1Tickets, intPlayer2Tickets);
+    }//GEN-LAST:event_btnPlayer1WinsActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnPlayer1Wins;
     // End of variables declaration//GEN-END:variables
 }
