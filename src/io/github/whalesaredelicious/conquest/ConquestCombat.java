@@ -98,6 +98,7 @@ public class ConquestCombat {
         return intCoords;
     }
     private static boolean findEnemyUnits(int gridX, int gridY) {
+        //Checks for enemy units in the set coordinates, as set in the parameters.
         boolean booleanEnemyFound = false;
         int x = 0, y = 1; //Coordinate axes
         try {
@@ -136,6 +137,7 @@ public class ConquestCombat {
         return booleanEnemyFound;
     }
     public static int findSpecificEnemyUnit(int gridX, int gridY) {
+        //Finds an enemy unit in the defined coordinates in the set parameters, and returns the enemy unit number.
         int intEnemyFound = 999; //999 is a sentinel value that the method will return if no unit found.
         int x = 0, y = 1; //Coordinate axes
         try {
@@ -174,6 +176,7 @@ public class ConquestCombat {
         return intEnemyFound;
     }
     public static String getCapturePointID (int unitSelected) {
+        //checks if a unit is on a capture point, and returns the capture point's ID if the unit is on one.
         int x = 0, y = 1;
         String stringCapturePointID = "";
         

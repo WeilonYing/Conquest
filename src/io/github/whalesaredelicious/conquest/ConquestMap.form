@@ -39,7 +39,7 @@
         <Component class="javax.swing.JLabel" name="lblUnit1_1">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/io/github/whalesaredelicious/conquest/assets/soldier.png"/>
+              <Image iconType="3" name="/io/github/whalesaredelicious/conquest/assets/soldier1_1.png"/>
             </Property>
           </Properties>
           <AuxValues>
@@ -54,7 +54,7 @@
         <Component class="javax.swing.JLabel" name="lblUnit1_2">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/io/github/whalesaredelicious/conquest/assets/soldier.png"/>
+              <Image iconType="3" name="/io/github/whalesaredelicious/conquest/assets/soldier1_2.png"/>
             </Property>
           </Properties>
           <AuxValues>
@@ -69,7 +69,7 @@
         <Component class="javax.swing.JLabel" name="lblUnit1_3">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/io/github/whalesaredelicious/conquest/assets/soldier.png"/>
+              <Image iconType="3" name="/io/github/whalesaredelicious/conquest/assets/soldier1_3.png"/>
             </Property>
           </Properties>
           <AuxValues>
@@ -84,7 +84,7 @@
         <Component class="javax.swing.JLabel" name="lblUnit2_1">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/io/github/whalesaredelicious/conquest/assets/soldier.png"/>
+              <Image iconType="3" name="/io/github/whalesaredelicious/conquest/assets/soldier2_1.png"/>
             </Property>
           </Properties>
           <AuxValues>
@@ -99,7 +99,7 @@
         <Component class="javax.swing.JLabel" name="lblUnit2_2">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/io/github/whalesaredelicious/conquest/assets/soldier.png"/>
+              <Image iconType="3" name="/io/github/whalesaredelicious/conquest/assets/soldier2_2.png"/>
             </Property>
           </Properties>
           <AuxValues>
@@ -114,7 +114,7 @@
         <Component class="javax.swing.JLabel" name="lblUnit2_3">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/io/github/whalesaredelicious/conquest/assets/soldier.png"/>
+              <Image iconType="3" name="/io/github/whalesaredelicious/conquest/assets/soldier2_3.png"/>
             </Property>
           </Properties>
           <AuxValues>

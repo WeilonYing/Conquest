@@ -110,8 +110,6 @@ public class Conquest extends JFrame {
     private Border borderBlue = BorderFactory.createBevelBorder(1, blue, blue, blue, blue); //Player 2's land
     
     //Declare progress bars (for ticket count)
-    private JProgressBar progressbarPlayer1 = new JProgressBar(0, 100);
-    private JProgressBar progressbarPlayer2 = new JProgressBar(0, 100);
     private JProgressBar[] progressbarPlayerTickets = new JProgressBar[2];
     
     static ConquestMap conquestmap = new ConquestMap();
@@ -310,13 +308,6 @@ public class Conquest extends JFrame {
     private void initProgressBars() {
         int boundaryX = this.getSize().width, boundaryY = this.getSize().height;
         int p1 = 0, p2 = 1; //Player numbers
-        progressbarPlayer1.setBounds(boundaryX - 550, boundaryY - 295, 120, 30);
-        progressbarPlayer1.setValue(100);
-        progressbarPlayer1.setForeground(red);
-        progressbarPlayer1.setStringPainted(true);
-        progressbarPlayer1.setString("Tickets left: 50");
-        
-        progressbarPlayer2.setBounds(boundaryX - 220, boundaryY - 295, 120, 20);
         
         for (int player = 0; player < progressbarPlayerTickets.length; player++) {
             progressbarPlayerTickets[player] = new JProgressBar(0, 100);
@@ -1143,14 +1134,17 @@ public class Conquest extends JFrame {
         //Check if a player has lost all tickets.
         if (intPlayer1Tickets <= 0 || intPlayer2Tickets <= 0) {
             if (intPlayer1Tickets > intPlayer2Tickets && intPlayer1Tickets > 0) {
+                intPlayer2Tickets = 0;
                 msgBox(stringPlayer1 + " wins the game!", "Game Over!", "plain");
                 processWin(1);
             }
             else if (intPlayer2Tickets > intPlayer1Tickets && intPlayer2Tickets > 0) {
                 msgBox(stringPlayer2 + " wins the game!", "Game Over!", "plain");
+                intPlayer1Tickets = 0;
                 processWin(2);
             }
             else {
+                intPlayer1Tickets = 0; intPlayer2Tickets = 0;
                 msgBox("Both players lost all their tickets at the same time! It's a draw!", "Game Over!", "plain");
                 processWin(0);
             }
@@ -1158,12 +1152,25 @@ public class Conquest extends JFrame {
         }
     }
     private void processWin(int winner) {
+        btnEndTurn.setEnabled(false);
+        btnRollDice.setEnabled(false);
+        toggleMoveCountButtonState(false, false);
+        btnSelectUnit1.setEnabled(false);
+        btnSelectUnit2.setEnabled(false);
+        btnSelectUnit3.setEnabled(false);
+        btnAttack.setEnabled(false);
+        this.setAlwaysOnTop(false);
+        this.dispose();
+        conquestmap.dispose();
         
+        ConquestScoresheet conquestscoresheet = new ConquestScoresheet();
+        conquestscoresheet.setVisible(true);
+        conquestscoresheet.setWinner(winner, stringPlayer1, stringPlayer2, intPlayer1Tickets, intPlayer2Tickets);
     }
     private void updateProgressBars() { //Update the progress bars to the new values.
         int p1 = 0, p2 = 1; //Player numbers
-        double p1Progress = (intPlayer1Tickets/intInitialPlayer1Tickets) * 100;
-        double p2Progress = (intPlayer2Tickets/intInitialPlayer2Tickets) * 100;
+        double p1Progress = (intPlayer1Tickets/(double)intInitialPlayer1Tickets) * 100;
+        double p2Progress = (intPlayer2Tickets/(double)intInitialPlayer2Tickets) * 100;
         log("Player 1 Tickets left: " + Double.toString(p1Progress));
         progressbarPlayerTickets[p1].setValue((int) p1Progress);
         progressbarPlayerTickets[p1].setString("Tickets left: " + Integer.toString(intPlayer1Tickets));
@@ -1299,54 +1306,22 @@ public class Conquest extends JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        btnPlayer1Wins = new javax.swing.JButton();
-
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
-        btnPlayer1Wins.setText("Player 1 wins");
-        btnPlayer1Wins.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnPlayer1WinsActionPerformed(evt);
-            }
-        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(328, Short.MAX_VALUE)
-                .addComponent(btnPlayer1Wins)
-                .addGap(177, 177, 177))
+            .addGap(0, 600, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(76, 76, 76)
-                .addComponent(btnPlayer1Wins)
-                .addContainerGap(201, Short.MAX_VALUE))
+            .addGap(0, 300, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnPlayer1WinsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPlayer1WinsActionPerformed
-        btnEndTurn.setEnabled(false);
-        btnRollDice.setEnabled(false);
-        toggleMoveCountButtonState(false, false);
-        btnSelectUnit1.setEnabled(false);
-        btnSelectUnit2.setEnabled(false);
-        btnSelectUnit3.setEnabled(false);
-        btnAttack.setEnabled(false);
-        this.setAlwaysOnTop(false);
-        this.dispose();
-        
-        ConquestScoresheet conquestscoresheet = new ConquestScoresheet();
-        conquestscoresheet.setVisible(true);
-        conquestscoresheet.setWinner(1, stringPlayer1, stringPlayer2, intPlayer1Tickets, intPlayer2Tickets);
-    }//GEN-LAST:event_btnPlayer1WinsActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnPlayer1Wins;
     // End of variables declaration//GEN-END:variables
 }

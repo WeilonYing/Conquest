@@ -75,27 +75,27 @@ public final class ConquestMap extends JFrame {
 
         panelUnits.setLayout(null);
 
-        lblUnit1_1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/io/github/whalesaredelicious/conquest/assets/soldier.png"))); // NOI18N
+        lblUnit1_1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/io/github/whalesaredelicious/conquest/assets/soldier1_1.png"))); // NOI18N
         panelUnits.add(lblUnit1_1);
         lblUnit1_1.setBounds(10, 10, 60, 60);
 
-        lblUnit1_2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/io/github/whalesaredelicious/conquest/assets/soldier.png"))); // NOI18N
+        lblUnit1_2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/io/github/whalesaredelicious/conquest/assets/soldier1_2.png"))); // NOI18N
         panelUnits.add(lblUnit1_2);
         lblUnit1_2.setBounds(76, 11, 60, 60);
 
-        lblUnit1_3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/io/github/whalesaredelicious/conquest/assets/soldier.png"))); // NOI18N
+        lblUnit1_3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/io/github/whalesaredelicious/conquest/assets/soldier1_3.png"))); // NOI18N
         panelUnits.add(lblUnit1_3);
         lblUnit1_3.setBounds(10, 77, 60, 60);
 
-        lblUnit2_1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/io/github/whalesaredelicious/conquest/assets/soldier.png"))); // NOI18N
+        lblUnit2_1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/io/github/whalesaredelicious/conquest/assets/soldier2_1.png"))); // NOI18N
         panelUnits.add(lblUnit2_1);
         lblUnit2_1.setBounds(835, 529, 60, 60);
 
-        lblUnit2_2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/io/github/whalesaredelicious/conquest/assets/soldier.png"))); // NOI18N
+        lblUnit2_2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/io/github/whalesaredelicious/conquest/assets/soldier2_2.png"))); // NOI18N
         panelUnits.add(lblUnit2_2);
         lblUnit2_2.setBounds(769, 529, 60, 60);
 
-        lblUnit2_3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/io/github/whalesaredelicious/conquest/assets/soldier.png"))); // NOI18N
+        lblUnit2_3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/io/github/whalesaredelicious/conquest/assets/soldier2_3.png"))); // NOI18N
         panelUnits.add(lblUnit2_3);
         lblUnit2_3.setBounds(835, 470, 60, 60);
 
@@ -156,13 +156,14 @@ public final class ConquestMap extends JFrame {
     
     //Initialisation methods - Called on start.
     public void initLocations() {
+        //Higher level method to set up lcoation related processes
         initPointLocation();
         resetGridOccupied();
         initUnitLocations();
         initCapturePoints();
     }
     private void initPointLocation() {
-        //Make possible location points
+        //Set up possible locations a unit can be located in as a coordinate system.
         //Grid is 18 gridX 11.
         for (int gridX = 0; gridX < pointLocation.length; gridX++) {
             for (int gridY = 0; gridY < pointLocation[gridY].length; gridY++) {
@@ -174,6 +175,7 @@ public final class ConquestMap extends JFrame {
 
     }
     private void initCapturePoints() {
+        //Sets the capture points on the map.
         int x = 0, y = 1; //Coordinate axes
         
         //Initialise grid capture points.
@@ -182,6 +184,7 @@ public final class ConquestMap extends JFrame {
                 booleanGridCapturePoints[gridX][gridY] = false;
             }
         }
+        
         //Initialise capture point statuses
         for (int i = 0; i < intCapturePointStatus.length; i++) {
             intCapturePointStatus[i] = 0;
@@ -204,6 +207,7 @@ public final class ConquestMap extends JFrame {
     }
 
     private void initUnitLocations() {
+        //Defines the unit location coordinates, then sets their locations to said location coordinates.
         int x = 0, y = 1; //These represent the coordinate axes
         intUnit1_1Coords[x] = 1;
         intUnit1_1Coords[y] = 1;
@@ -239,14 +243,14 @@ public final class ConquestMap extends JFrame {
     
     //Grid management methods
     private static void resetGridOccupied() {
+        //Sets all grid locations to be unoccupied.
         for (int gridX = 0; gridX < booleanGridOccupied.length; gridX++) {
             for (int gridY = 0; gridY < booleanGridOccupied[gridX].length; gridY++) {
                 booleanGridOccupied[gridX][gridY] = false;
-                if (booleanGridOccupied[gridX][gridY]) {
-                    break;
-                }
             }
         }
+        
+        //To do: create obstructed areas.
     }
     private static void setGridOccupied(int unitSelected, int moveDirection, int moveAmount) {
         /**
@@ -386,6 +390,7 @@ public final class ConquestMap extends JFrame {
         if (!Conquest.booleanUnitKilled[5]) {booleanGridOccupied[intUnit2_3Coords[x]][intUnit2_3Coords[y]] = true; }
     }
     public static boolean[] checkGridOccupied(int unitSelected) {
+        //checks if a grid location is occupied next to a unit and disables the appropriate buttons
         int x = 0, y = 1; //Coordinate axes
         boolean[] booleanButtonGreyOut = new boolean[4]; //0 = up, 1 = right, 2 = down, 3 = left.
         for (int i = 0; i < booleanButtonGreyOut.length; i++) {
@@ -595,6 +600,7 @@ public final class ConquestMap extends JFrame {
     }
     //Unit management methods
     public static void move(int moveDirection) {
+        //Calls moveUnit after finding whose turn it is.
         //1 = up, 2 = right, 3 = down, 4 = left
         if (Conquest.booleanIsPlayer1Turn) {
             for (int i = 0; i < Conquest.booleanPlayer1UnitSelected.length; i++) {
@@ -614,25 +620,26 @@ public final class ConquestMap extends JFrame {
         }
     }
     private static void moveUnit(int unitSelected, int moveDirection) {
+        //Sets the new location of the selected unit.
         setGridOccupied(unitSelected, moveDirection, 1);
         switch (unitSelected) {
             case 0:
-                lblUnit1_1.setLocation(newLocation(unitSelected, moveDirection));
+                lblUnit1_1.setLocation(newLocation(unitSelected));
                 break;
             case 1:
-                lblUnit1_2.setLocation(newLocation(unitSelected, moveDirection));
+                lblUnit1_2.setLocation(newLocation(unitSelected));
                 break;
             case 2:
-                lblUnit1_3.setLocation(newLocation(unitSelected, moveDirection));
+                lblUnit1_3.setLocation(newLocation(unitSelected));
                 break;
             case 3:
-                lblUnit2_1.setLocation(newLocation(unitSelected, moveDirection));
+                lblUnit2_1.setLocation(newLocation(unitSelected));
                 break;
             case 4:
-                lblUnit2_2.setLocation(newLocation(unitSelected, moveDirection));
+                lblUnit2_2.setLocation(newLocation(unitSelected));
                 break;
             case 5:
-                lblUnit2_3.setLocation(newLocation(unitSelected, moveDirection));
+                lblUnit2_3.setLocation(newLocation(unitSelected));
                 break;
             default:
                 log("Invalid unit selection");
@@ -640,12 +647,12 @@ public final class ConquestMap extends JFrame {
         }
         
     }
-    private static Point newLocation(int unitSelected, int moveDirection) {
+    private static Point newLocation(int unitSelected) {
         /**
          * This method sets the new screen location of the units depending on its set coordinates.
          * Note: This method does not manage the coordinates. It simply reads off of it.
-         * The coordinates must be changed before this method is called or the units
-         * will not move properly.
+         * The coordinates must be changed prior to calling this method or the unit will 
+         * not appear to have moved.
          */
         //1 = up, 2 = right, 3 = down, 4 = left
 
@@ -703,7 +710,6 @@ public final class ConquestMap extends JFrame {
         }
     }
     public static void disableUnit(int unitNumber) { //Remove a unit from the battlefield, then set its proviously occupied space to false;
-        int x = 0, y = 1; //Coordinate axes
         switch (unitNumber) {
             case 0:
                 lblUnit1_1.setVisible(false);
