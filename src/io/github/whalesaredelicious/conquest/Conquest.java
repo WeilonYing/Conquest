@@ -603,12 +603,14 @@ public class Conquest extends JFrame {
             //kill defending unit
             killUnit(defendingUnit);
             log("Kill defending unit: " + Integer.toString(defendingUnit));
+            JOptionPane.showMessageDialog(this, "Your unit wins the battle!", "Attack Result", JOptionPane.PLAIN_MESSAGE);
         }
         else if (attackingUnitPower < defendingUnitPower) {
             //kill attacking unit
             killUnit(attackingUnit);
             booleanUnitSelected = false; //Unit can no longer be selected since it is killed.
             log("Kill attacking unit: " + Integer.toString(attackingUnit));
+            JOptionPane.showMessageDialog(this, "The enemy unit wins the battle!", "Attack Result", JOptionPane.PLAIN_MESSAGE);
         }
         else {
             //kill both units
@@ -616,6 +618,7 @@ public class Conquest extends JFrame {
             killUnit(attackingUnit);
             booleanUnitSelected = false; //Unit can no longer be selected since it is killed.
             out.println("Kill both units: " + attackingUnit + ", " + defendingUnit);
+            JOptionPane.showMessageDialog(this, "Both units were equally strong, and annihilated each other!", "Attack Result", JOptionPane.PLAIN_MESSAGE);
         }
         checkUnitsKilled();
         
@@ -1310,7 +1313,27 @@ public class Conquest extends JFrame {
         upgradeUnit(3, 1);
     }
     private void btnEndTurnPressed(ActionEvent evt) {
-        changeTurn();
+        if (booleanDiceRolled) {
+            if (intNumMoves == 0) {
+                changeTurn();
+            }
+            else {
+                int confirmEndTurn = JOptionPane.showConfirmDialog(this, "You haven't used all your moves. "
+                    + "You cannot 'save' your moves for subsequent turns. Are you sure you want to end your turn?", 
+                    "Confirm End Turn", JOptionPane.YES_NO_OPTION);
+                if (confirmEndTurn == 0) { //If yes
+                    changeTurn();
+                }
+            }
+            
+        }
+        else {
+            int confirmEndTurn = JOptionPane.showConfirmDialog(this, "You haven't rolled the dice. Are you sure you want to end your turn?", 
+                    "Confirm End Turn", JOptionPane.YES_NO_OPTION);
+            if (confirmEndTurn == 0) { //If yes
+                changeTurn();
+            }
+        }
     }
     private void btnRollDicePressed(ActionEvent evt) {
         rollDice();
