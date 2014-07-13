@@ -30,7 +30,7 @@ public class ConquestScoresheet extends javax.swing.JFrame {
     public ConquestScoresheet() {
         initComponents();
         initScoresheet();
-        setAlwaysOnTop(true);
+        //setAlwaysOnTop(true);
         setLocationRelativeTo(null);
     }
     private void initScoresheet() {
@@ -39,10 +39,14 @@ public class ConquestScoresheet extends javax.swing.JFrame {
         lblPlayer2Name.setHorizontalAlignment(JLabel.CENTER);
         lblPlayer1Tickets.setHorizontalAlignment(JLabel.CENTER);
         lblPlayer2Tickets.setHorizontalAlignment(JLabel.CENTER);
+        
+        lblAllUnitsKilled1.setVisible(false);
+        lblAllUnitsKilled2.setVisible(false);
     }
-    public void setWinner(int winner, String player1Name, String player2Name, int player1Tickets, int player2Tickets) {
+    public void setWinner(int winner, String player1Name, String player2Name, int player1Tickets, int player2Tickets,
+            boolean allUnitsKilledPlayer1, boolean allUnitsKilledPlayer2) {
         switch (winner) {
-            case 0:
+            case 0: //0 = draw;
                 lblWinner.setText("It's a draw!");
                 break;
             case 1:
@@ -57,6 +61,9 @@ public class ConquestScoresheet extends javax.swing.JFrame {
         
         lblPlayer1Tickets.setText(Integer.toString(player1Tickets));
         lblPlayer2Tickets.setText(Integer.toString(player2Tickets));
+        
+        lblAllUnitsKilled1.setVisible(allUnitsKilledPlayer1);
+        lblAllUnitsKilled2.setVisible(allUnitsKilledPlayer2);
     }
 
     /**
@@ -77,6 +84,8 @@ public class ConquestScoresheet extends javax.swing.JFrame {
         lblPlayer2Tickets = new javax.swing.JLabel();
         btnQuit = new javax.swing.JButton();
         btnRestart = new javax.swing.JButton();
+        lblAllUnitsKilled1 = new javax.swing.JLabel();
+        lblAllUnitsKilled2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -117,6 +126,12 @@ public class ConquestScoresheet extends javax.swing.JFrame {
             }
         });
 
+        lblAllUnitsKilled1.setFont(new java.awt.Font("Garamond", 0, 14)); // NOI18N
+        lblAllUnitsKilled1.setText("All units killed!");
+
+        lblAllUnitsKilled2.setFont(new java.awt.Font("Garamond", 0, 14)); // NOI18N
+        lblAllUnitsKilled2.setText("All units killed!");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -131,16 +146,6 @@ public class ConquestScoresheet extends javax.swing.JFrame {
                 .addComponent(lblPlayer2Name, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(40, 40, 40)
-                .addComponent(lblPlayer1Tickets, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(lblPlayer2Tickets, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(42, 42, 42))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(32, 32, 32)
-                .addComponent(lblWinner, javax.swing.GroupLayout.PREFERRED_SIZE, 335, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(btnRestart, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -151,6 +156,23 @@ public class ConquestScoresheet extends javax.swing.JFrame {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(btnQuit, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addContainerGap())))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(32, 32, 32)
+                .addComponent(lblWinner, javax.swing.GroupLayout.PREFERRED_SIZE, 335, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(34, 34, 34)
+                        .addComponent(lblPlayer1Tickets, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(44, 44, 44)
+                        .addComponent(lblAllUnitsKilled1)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblAllUnitsKilled2)
+                    .addComponent(lblPlayer2Tickets, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(42, 42, 42))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -159,16 +181,20 @@ public class ConquestScoresheet extends javax.swing.JFrame {
                 .addComponent(lblTitle)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblGameOverTitle)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblWinner)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblPlayer1Name)
                     .addComponent(lblPlayer2Name))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 19, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(lblPlayer1Tickets, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lblPlayer2Tickets, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblAllUnitsKilled2)
+                    .addComponent(lblAllUnitsKilled1))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblPlayer2Tickets, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblPlayer1Tickets, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(btnRestart, javax.swing.GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE)
@@ -234,6 +260,8 @@ public class ConquestScoresheet extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnQuit;
     private javax.swing.JButton btnRestart;
+    private javax.swing.JLabel lblAllUnitsKilled1;
+    private javax.swing.JLabel lblAllUnitsKilled2;
     private javax.swing.JLabel lblGameOverTitle;
     private javax.swing.JLabel lblPlayer1Name;
     private javax.swing.JLabel lblPlayer1Tickets;

@@ -462,7 +462,9 @@ public class Conquest extends JFrame {
         if ((intNumMoves - amount) >= 0) { //Checks if amount to remove will still be greater or equal to 0
             intNumMoves -= amount;
             setNumTurnsLabel(intNumMoves);
-            toggleMoveCountButtonState(true, true);
+            if (booleanUnitSelected) {
+                toggleMoveCountButtonState(true, true);
+            }
             if (intNumMoves == 0) {
                 toggleMoveCountButtonState(false, false);
             }
@@ -616,6 +618,45 @@ public class Conquest extends JFrame {
             out.println("Kill both units: " + attackingUnit + ", " + defendingUnit);
         }
         checkUnitsKilled();
+        
+                
+        //Check if all units are killed
+        boolean allUnitsKilled = true;
+        for (int i = 0; i < booleanUnitKilled.length; i++) {
+            if (!booleanUnitKilled[i]) {
+                allUnitsKilled = false;
+                break;
+            }
+        }
+        if (allUnitsKilled) {
+            msgBox("Both players' units are killed! It's a draw!", "Game Over!", "plain");
+            processWin(0, true, true);
+        }
+        else {
+            boolean allPlayer1UnitsKilled = true;
+            for (int i = 0; i < booleanUnitKilled.length - 3; i++) { //If player 1 units are all killed
+                if (!booleanUnitKilled[i]) {
+                    allPlayer1UnitsKilled = false;
+                    break;
+                }
+            }
+            if (allPlayer1UnitsKilled) {
+                msgBox("All of " + stringPlayer1 + "'s units are dead! Player 2 wins!", "Game Over!", "plain");
+                processWin(2, true, false);
+            }
+            
+            boolean allPlayer2UnitsKilled = true;
+            for (int i = 3; i < booleanUnitKilled.length; i++) { //If player 2 units are all killed
+                if (!booleanUnitKilled[i]) {
+                    allPlayer2UnitsKilled = false;
+                    break;
+                }
+            }
+            if (allPlayer2UnitsKilled) {
+                msgBox("All of " + stringPlayer2 + "'s units are dead! Player 1 wins!", "Game Over!", "plain");
+                processWin(1, false, true);
+            }
+        }
     }
     private void checkUnitsKilled() { //Checks which units are killed and disables the appropriate buttons.
         for (int i = 0; i < booleanUnitKilled.length; i++) {
@@ -627,6 +668,7 @@ public class Conquest extends JFrame {
                 enableUnitButtons(i);
             }
         }
+
     }
     private void killUnit(int unitNumber) {
         booleanUnitKilled[unitNumber] = true;
@@ -859,7 +901,9 @@ public class Conquest extends JFrame {
         //1 = up, 2 = right, 3 = down, 4 = left
         //Ensures buttons aren't set enabled if user doesn't have any moves left anyway.
         if (intNumMoves > 0) {
-            toggleMoveCountButtonState(true, true);
+            if (booleanUnitSelected) {
+                toggleMoveCountButtonState(true, true);
+            }
         }
         else {
             toggleMoveCountButtonState(false, false);
@@ -1020,7 +1064,7 @@ public class Conquest extends JFrame {
     //Player management methods
     private void selectUnit(int unitNumber) {
         //Processes unit selection. 
-        
+        booleanUnitSelected = true;
         //Select a unit by setting the appropriate array index to true and all others false.
         if (booleanIsPlayer1Turn) {
             for (int i = 0; i < booleanPlayer1UnitSelected.length; i++) {
@@ -1029,8 +1073,6 @@ public class Conquest extends JFrame {
             }
             booleanPlayer1UnitSelected[unitNumber] = true;
             checkPossibleMoveDirections();
-            
-            booleanUnitSelected = true;
         }
         else {
             for (int i = 0; i < booleanPlayer2UnitSelected.length; i++) {
@@ -1038,7 +1080,6 @@ public class Conquest extends JFrame {
             }
             booleanPlayer2UnitSelected[unitNumber] = true;
             checkPossibleMoveDirections();
-            booleanUnitSelected = true;
         }
         lblCurrentSelectedUnit.setText("<html><b>Current selected unit: </b>" + Integer.toString(unitNumber + 1) + "</html>");
         checkUnitsKilled(); //Check which units are killed so that they cannot be selected/upgraded.
@@ -1136,22 +1177,24 @@ public class Conquest extends JFrame {
             if (intPlayer1Tickets > intPlayer2Tickets && intPlayer1Tickets > 0) {
                 intPlayer2Tickets = 0;
                 msgBox(stringPlayer1 + " wins the game!", "Game Over!", "plain");
-                processWin(1);
+                processWin(1, false, false);
             }
             else if (intPlayer2Tickets > intPlayer1Tickets && intPlayer2Tickets > 0) {
                 msgBox(stringPlayer2 + " wins the game!", "Game Over!", "plain");
                 intPlayer1Tickets = 0;
-                processWin(2);
+                processWin(2, false, false);
             }
             else {
                 intPlayer1Tickets = 0; intPlayer2Tickets = 0;
                 msgBox("Both players lost all their tickets at the same time! It's a draw!", "Game Over!", "plain");
-                processWin(0);
+                processWin(0, false, false);
             }
             //TO DO: Scoresheet
         }
     }
-    private void processWin(int winner) {
+    private void processWin(int winner, boolean allUnitsKilledPlayer1, boolean allUnitsKilledPlayer2) {
+        //Closes game and announces the winner.
+        //if winner = 0, game is a draw.
         btnEndTurn.setEnabled(false);
         btnRollDice.setEnabled(false);
         toggleMoveCountButtonState(false, false);
@@ -1165,7 +1208,8 @@ public class Conquest extends JFrame {
         
         ConquestScoresheet conquestscoresheet = new ConquestScoresheet();
         conquestscoresheet.setVisible(true);
-        conquestscoresheet.setWinner(winner, stringPlayer1, stringPlayer2, intPlayer1Tickets, intPlayer2Tickets);
+        conquestscoresheet.setWinner(winner, stringPlayer1, stringPlayer2, intPlayer1Tickets, intPlayer2Tickets,
+                allUnitsKilledPlayer1, allUnitsKilledPlayer2);
     }
     private void updateProgressBars() { //Update the progress bars to the new values.
         int p1 = 0, p2 = 1; //Player numbers

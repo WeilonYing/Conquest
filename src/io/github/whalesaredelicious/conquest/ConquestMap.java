@@ -192,8 +192,8 @@ public final class ConquestMap extends JFrame {
         //Set capture point locations
         intCapturePointA[x] = 7; intCapturePointA[y] = 2;
         intCapturePointB[x] = 13; intCapturePointB[y] = 3;
-        intCapturePointC[x] = 4; intCapturePointC[y] = 8;
-        intCapturePointD[x] = 10; intCapturePointD[y] = 9;
+        intCapturePointC[x] = 4; intCapturePointC[y] = 7;
+        intCapturePointD[x] = 10; intCapturePointD[y] = 8;
         
         //Bind these locations to the capture points array.
         intCapturePointLocations[0][0] = intCapturePointA[x];
@@ -250,7 +250,23 @@ public final class ConquestMap extends JFrame {
             }
         }
         
-        //To do: create obstructed areas.
+        //Obstructed areas
+        booleanGridOccupied[10][1] = true;
+        booleanGridOccupied[10][2] = true;
+        booleanGridOccupied[11][1] = true;
+        booleanGridOccupied[11][2] = true;
+        
+        booleanGridOccupied[8][4] = true;
+        booleanGridOccupied[8][5] = true;
+        booleanGridOccupied[8][6] = true;
+        booleanGridOccupied[9][4] = true;
+        booleanGridOccupied[9][5] = true;
+        booleanGridOccupied[9][6] = true;
+        
+        booleanGridOccupied[6][8] = true;
+        booleanGridOccupied[7][8] = true;
+        booleanGridOccupied[6][9] = true;
+        booleanGridOccupied[7][9] = true;
     }
     private static void setGridOccupied(int unitSelected, int moveDirection, int moveAmount) {
         /**
