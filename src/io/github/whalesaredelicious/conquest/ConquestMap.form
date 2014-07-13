@@ -142,7 +142,7 @@
         <Component class="javax.swing.JLabel" name="lblMap">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/io/github/whalesaredelicious/conquest/assets/Map.png"/>
+              <Image iconType="3" name="/io/github/whalesaredelicious/conquest/assets/map.png"/>
             </Property>
           </Properties>
           <Constraints>

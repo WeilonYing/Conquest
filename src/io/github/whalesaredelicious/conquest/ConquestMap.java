@@ -104,7 +104,7 @@ public final class ConquestMap extends JFrame {
 
         panelMap.setLayout(null);
 
-        lblMap.setIcon(new javax.swing.ImageIcon(getClass().getResource("/io/github/whalesaredelicious/conquest/assets/Map.png"))); // NOI18N
+        lblMap.setIcon(new javax.swing.ImageIcon(getClass().getResource("/io/github/whalesaredelicious/conquest/assets/map.png"))); // NOI18N
         panelMap.add(lblMap);
         lblMap.setBounds(0, 0, 910, 610);
 

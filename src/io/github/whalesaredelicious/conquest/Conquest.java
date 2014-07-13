@@ -1131,7 +1131,7 @@ public class Conquest extends JFrame {
     }
     private void rollDice() { //Generate a random integer between 1-6
         intNumMoves = (RandomIntGenerator(1, 6));
-        intNumMoves = 100;
+        //intNumMoves = 100;
         setNumTurnsLabel(intNumMoves);
         
         //Re-enable the buttons
