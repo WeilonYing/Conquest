@@ -16,6 +16,9 @@
 
 package io.github.whalesaredelicious.conquest;
 
+import static io.github.whalesaredelicious.conquest.FileAccessor.checkFileExists;
+import static io.github.whalesaredelicious.conquest.FileAccessor.read;
+import static io.github.whalesaredelicious.conquest.FileAccessor.regenFile;
 import java.awt.Frame;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -40,8 +43,26 @@ public class ConquestStart extends JDialog {
         setResizable(false);
         initCloseListener();
         setLocationRelativeTo(null);
+        getHighScores();
     }
-    public void initCloseListener() {
+    private void getHighScores() { //Get the high scores and displays them on the start screen.
+        if (!checkFileExists(Conquest.stringHighScoreFile)) { //Check if high score file exists.
+            regenFile(Conquest.stringHighScoreFile); //Regenerate high score file if it doesn't exist
+        }
+        try {
+            String stringHighScorePlayer = read(Conquest.stringHighScoreFile, "playerName");
+            int intHighScoreValue = Integer.parseInt(read(Conquest.stringHighScoreFile, "score"));
+            
+            lblCurrentHighScoreTitle.setText("<html><b>Current High Score: </b>" + stringHighScorePlayer );
+            lblCurrentHighScoreValue.setText(Integer.toString(intHighScoreValue));
+        }
+        catch (Exception e) {
+            lblCurrentHighScoreTitle.setText("<html><b>Current High Score: </b>" + "None" );
+            lblCurrentHighScoreValue.setText(Integer.toString(0));
+        }
+        
+    }
+    private void initCloseListener() {
         //Exit the program entirely if X button is pressed.
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
@@ -64,10 +85,12 @@ public class ConquestStart extends JDialog {
         lblTitle = new javax.swing.JLabel();
         btnExit = new javax.swing.JButton();
         btnStartGame = new javax.swing.JButton();
-        lblPlayer1Heading = new javax.swing.JLabel();
+        lblCurrentHighScoreTitle = new javax.swing.JLabel();
         lblPlayer2Heading = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         btnHowToPlay = new javax.swing.JButton();
+        lblPlayer1Heading1 = new javax.swing.JLabel();
+        lblCurrentHighScoreValue = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Conquest");
@@ -95,8 +118,8 @@ public class ConquestStart extends JDialog {
             }
         });
 
-        lblPlayer1Heading.setFont(new java.awt.Font("Garamond", 0, 18)); // NOI18N
-        lblPlayer1Heading.setText("Player 1");
+        lblCurrentHighScoreTitle.setFont(new java.awt.Font("Garamond", 0, 18)); // NOI18N
+        lblCurrentHighScoreTitle.setText("Current High Score: None");
 
         lblPlayer2Heading.setFont(new java.awt.Font("Garamond", 0, 18)); // NOI18N
         lblPlayer2Heading.setText("Player 2");
@@ -111,14 +134,18 @@ public class ConquestStart extends JDialog {
             }
         });
 
+        lblPlayer1Heading1.setFont(new java.awt.Font("Garamond", 0, 18)); // NOI18N
+        lblPlayer1Heading1.setText("Player 1");
+
+        lblCurrentHighScoreValue.setFont(new java.awt.Font("Garamond", 0, 18)); // NOI18N
+        lblCurrentHighScoreValue.setText("0");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(49, 49, 49)
-                .addComponent(lblPlayer1Heading)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(lblPlayer2Heading)
                 .addGap(54, 54, 54))
             .addGroup(layout.createSequentialGroup()
@@ -131,18 +158,28 @@ public class ConquestStart extends JDialog {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnExit, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addComponent(txtfieldPlayer1, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGap(18, 18, 18)
+                                    .addComponent(txtfieldPlayer2, javax.swing.GroupLayout.PREFERRED_SIZE, 182, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGroup(layout.createSequentialGroup()
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                        .addComponent(lblTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addGap(90, 90, 90)))
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(txtfieldPlayer1, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(txtfieldPlayer2, javax.swing.GroupLayout.PREFERRED_SIZE, 182, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(lblTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addGap(90, 90, 90)))
+                                .addComponent(lblCurrentHighScoreTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 284, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(lblCurrentHighScoreValue, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createSequentialGroup()
+                    .addGap(59, 59, 59)
+                    .addComponent(lblPlayer1Heading1)
+                    .addContainerGap(284, Short.MAX_VALUE)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -152,19 +189,27 @@ public class ConquestStart extends JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 34, Short.MAX_VALUE)
                 .addComponent(jLabel1)
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblPlayer1Heading)
-                    .addComponent(lblPlayer2Heading))
+                .addComponent(lblPlayer2Heading)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtfieldPlayer1, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtfieldPlayer2, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(40, 40, 40)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnStartGame, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnHowToPlay, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnExit, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblCurrentHighScoreTitle)
+                        .addGap(8, 8, 8)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnStartGame, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnHowToPlay, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnExit, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(lblCurrentHighScoreValue, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                    .addContainerGap(156, Short.MAX_VALUE)
+                    .addComponent(lblPlayer1Heading1)
+                    .addGap(123, 123, 123)))
         );
 
         pack();
@@ -327,7 +372,9 @@ public class ConquestStart extends JDialog {
     private javax.swing.JButton btnHowToPlay;
     private javax.swing.JButton btnStartGame;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel lblPlayer1Heading;
+    private javax.swing.JLabel lblCurrentHighScoreTitle;
+    private javax.swing.JLabel lblCurrentHighScoreValue;
+    private javax.swing.JLabel lblPlayer1Heading1;
     private javax.swing.JLabel lblPlayer2Heading;
     private javax.swing.JLabel lblTitle;
     private javax.swing.JTextField txtfieldPlayer1;

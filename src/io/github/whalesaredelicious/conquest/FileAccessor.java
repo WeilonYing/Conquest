@@ -15,8 +15,14 @@
  * You may get a copy of the license here: https://creativecommons.org/licenses/by-sa/4.0/
  */
 
+/**
+ * INFORMATION
+ * This is the FileAccessor API written by Weilon. This API allows you to read, write, create and delete files easily.
+ */
+
 package io.github.whalesaredelicious.conquest;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -28,38 +34,17 @@ import javax.swing.JOptionPane;
  
 public class FileAccessor{
     
-    public static String read(String fileName, String dataName) { //Read data from specified text file
+    public static String read(String fileName, String dataName) throws Exception{ //Read data from specified text file
         /* 
             fileName is the name of the file.
             dataName is the name of the data variable being retrieved.
         */
-        try {
             Properties file = new Properties(); //Instantialise Properties class in order to interact with file.
             FileInputStream input = new FileInputStream(fileName); //Instantialise FileInputStream class to prepare for file reading.
-            try {
                 file.load(input);
                 String dataValue = file.getProperty(dataName);
                 input.close(); //Close input stream as program no longer needs to read the file.
                 return dataValue;
-            } catch (IOException error) {
-                /* 
-                    If this occurs, there was a problem with reading from the file.
-                    Details will be logged to the console
-                */
-                log("IO Exception error after attempting to read file " + fileName);
-                log(error.getMessage());
-                return null;
-            }
-        }
-        catch (FileNotFoundException error) {
-            /* 
-                If this occurs, there was a problem with locating the file.
-                Details will be logged to the console
-            */
-            log("FileNotFound Exception occurred. Cannot find file " + fileName);
-            log(error.getMessage());
-            return null;
-        }
     }
     public static boolean write(String fileName, String dataName, String dataValue) {
         /* 
@@ -147,19 +132,88 @@ public class FileAccessor{
                 ======
                 Add data names when needed.
             */
-            write(fileName, "displaySettingsPanel", "true");
+            if (fileName == Conquest.stringSaveFile) {
+                writeConquestProperties(fileName);
+            }
+            else if (fileName == Conquest.stringHighScoreFile) {
+                writeHighScore(fileName);
+            }
         }
         catch (FileNotFoundException error) {
             log("FileNotFound Exception occurred. Cannot find file " + fileName);
             log(error.getMessage());
             msgBox("Unable to access file " + fileName + " due to a severe error."
-                    + "Conquest will need to close. Please notify the game developer of this issue.", "Error", "error");
+                    + " Please notify the game developer of this issue.", "Error", "error");
         }
         catch (UnsupportedEncodingException error) {
             log("UnsupportedEncoding Exception occurred when attempting to write to file " + fileName);
             log(error.getMessage());
             msgBox("Unable to write to file " + fileName + " due to a severe error."
-                    + "Conquest will need to close. Please notify the game developer of this issue.", "Error", "error");
+                    + " Please notify the game developer of this issue.", "Error", "error");
+        }
+    }
+    private static void writeHighScore(String fileName) throws FileNotFoundException, UnsupportedEncodingException {
+        write(fileName, "playerName", "None");
+        write(fileName, "score", "0");
+    }
+    private static void writeConquestProperties(String fileName) 
+            throws FileNotFoundException, UnsupportedEncodingException { 
+        //This is to ensure that code that is specific to Conquest can be easily separated from the reusable portion.
+        write(fileName, "gameFinished", "true");
+        write(fileName, "stringPlayer1Name", "Player 1");
+        write(fileName, "stringPlayer2Name", "Player 2");
+
+        write(fileName, "intPlayer1TicketsLeft", "50");
+        write(fileName, "intPlayer2TicketsLeft", "50");
+
+        write(fileName, "booleanIsPlayer1Turn", "true");
+        write(fileName, "booleanDiceRolled", "false");
+        write(fileName, "intNumMoves", "0");
+        //Unit Positions
+        write(fileName, "intUnit0PosX", "0");
+        write(fileName, "intUnit0PosY", "0");
+        write(fileName, "intUnit0Power", "1");
+
+        write(fileName, "intUnit1PosX", "1");
+        write(fileName, "intUnit1PosY", "1");
+        write(fileName, "intUnit1Power", "1");
+
+        write(fileName, "intUnit2PosX", "2");
+        write(fileName, "intUnit2PosY", "2");
+        write(fileName, "intUnit2Power", "1");
+
+        write(fileName, "intUnit3PosX", "3");
+        write(fileName, "intUnit3PosY", "3");
+        write(fileName, "intUnit3Power", "1");
+
+        write(fileName, "intUnit4PosX", "4");
+        write(fileName, "intUnit4PosY", "4");
+        write(fileName, "intUnit4Power", "1");
+
+        write(fileName, "intUnit5PosX", "5");
+        write(fileName, "intUnit5PosY", "5");
+        write(fileName, "intUnit5Power", "1");
+
+        write(fileName, "capturePointAOwnership", "0");
+        write(fileName, "capturePointBOwnership", "0");
+        write(fileName, "capturePointCOwnership", "0");
+        write(fileName, "capturePointDOwnership", "0");
+    }
+    public static void deleteFile (String fileName) {
+        try {
+            File fileToDelete = new File(fileName);
+            fileToDelete.delete();
+        }
+        catch (NullPointerException error) {
+            log("Null Pointer Exception. Printing error details...");
+            log(error.getMessage());
+            msgBox("Unable to delete file file " + fileName + " due to NullPointerException error."
+                    + " Please notify the game developer of this issue.", "Error", "error");
+        }
+        catch (IllegalArgumentException error) {
+            log("Illegal Argument Exception. Printing error details...");
+            msgBox("Unable to delete file file " + fileName + " due to IllegalArgumentException error."
+                    + " Please notify the game developer of this issue.", "Error", "error");
         }
     }
     private static void log(String message) { //Method to make console logging tasks easier to do.

@@ -22,6 +22,8 @@
 package io.github.whalesaredelicious.conquest;
 
 import java.awt.Point;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
@@ -159,8 +161,18 @@ public final class ConquestMap extends JFrame {
         //Higher level method to set up lcoation related processes
         initPointLocation();
         resetGridOccupied();
+        initUnitCoordinates();
         initUnitLocations();
         initCapturePoints();
+        setCloseOperations();
+    }
+    private void setCloseOperations() {
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE); //Window will do nothing when close button is preseed.
+        this.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent evt) {
+                closeButtonPressed();
+            }
+        });
     }
     private void initPointLocation() {
         //Set up possible locations a unit can be located in as a coordinate system.
@@ -205,10 +217,8 @@ public final class ConquestMap extends JFrame {
         intCapturePointLocations[3][0] = intCapturePointD[x];
         intCapturePointLocations[3][1] = intCapturePointD[y];
     }
-
-    private void initUnitLocations() {
-        //Defines the unit location coordinates, then sets their locations to said location coordinates.
-        int x = 0, y = 1; //These represent the coordinate axes
+    private void initUnitCoordinates() {
+        int x = 0, y = 1; //Coordinate axes
         intUnit1_1Coords[x] = 1;
         intUnit1_1Coords[y] = 1;
         
@@ -225,8 +235,12 @@ public final class ConquestMap extends JFrame {
         intUnit2_2Coords[y] = 9;
         
         intUnit2_3Coords[x] = 16;
-        intUnit2_3Coords[y] = 8;
-        
+        intUnit2_3Coords[y] = 8;        
+    }
+    public static void initUnitLocations() {
+        //Defines the unit location coordinates, then sets their locations to said location coordinates.
+        int x = 0, y = 1; //These represent the coordinate axes
+
         lblUnit1_1.setLocation(pointLocation[intUnit1_1Coords[x]][intUnit1_1Coords[y]]);
         lblUnit1_2.setLocation(pointLocation[intUnit1_2Coords[x]][intUnit1_2Coords[y]]);
         lblUnit1_3.setLocation(pointLocation[intUnit1_3Coords[x]][intUnit1_3Coords[y]]);
@@ -779,6 +793,17 @@ public final class ConquestMap extends JFrame {
                     JOptionPane.showMessageDialog(null, message, title, JOptionPane.PLAIN_MESSAGE);
                     break;
             }
+        }
+    }
+    boolean dialogBoxOpened = false;
+    private void closeButtonPressed() {
+        if (!dialogBoxOpened) { //Due to limitations in Java, dialog boxes in daughter windows will duplicate. This is used to prevent that from happening.
+            dialogBoxOpened = true;
+            JOptionPane.showMessageDialog(this, "If you would like to exit the game, "
+                    + "please use the close button (X button) on the control window instead.", "Cannot Exit", JOptionPane.PLAIN_MESSAGE);
+        }
+        else {
+            dialogBoxOpened = false;
         }
     }
     //Auto-generated code below.

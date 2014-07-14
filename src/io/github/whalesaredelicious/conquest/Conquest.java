@@ -17,6 +17,11 @@
 package io.github.whalesaredelicious.conquest;
 
 import static io.github.whalesaredelicious.conquest.ConquestMap.intCapturePointStatus;
+import static io.github.whalesaredelicious.conquest.FileAccessor.checkFileExists;
+import static io.github.whalesaredelicious.conquest.FileAccessor.deleteFile;
+import static io.github.whalesaredelicious.conquest.FileAccessor.read;
+import static io.github.whalesaredelicious.conquest.FileAccessor.regenFile;
+import static io.github.whalesaredelicious.conquest.FileAccessor.write;
 import static java.awt.Color.blue;
 import static java.awt.Color.lightGray;
 import static java.awt.Color.red;
@@ -24,6 +29,8 @@ import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import static java.lang.System.out;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Logger.getLogger;
@@ -41,6 +48,9 @@ import javax.swing.border.Border;
  */
 public class Conquest extends JFrame {
     //Declare strings, booleans, and integers
+    public static String stringSaveFile = "savegame.save";
+    public static String stringHighScoreFile = "highscore.save";
+    
     public static String stringPlayerTurn;
     public static String stringPlayer1 = "Player 1";
     public static String stringPlayer2 = "Player 2";
@@ -117,13 +127,21 @@ public class Conquest extends JFrame {
     public Conquest() {
         super("Conquest");
         
+        //Initialise the GUI
         initComponents();
         initControls();
-        initLabels();
+        
         initProgressBars();
         initUnitsKilled();
-        
         setScreenParameters();
+        
+        //Set custom code for closing the program
+        setCloseOperations();
+        
+        //Check for game same, and restore the save if the user desires
+        checkGameSave();
+        
+        initLabels();
     }
     
     //Main method
@@ -149,20 +167,30 @@ public class Conquest extends JFrame {
         ConquestStart start = new ConquestStart(null, true);
         start.setVisible(true);
 
-        new Conquest().setVisible(true);
-
         conquestmap.setVisible(true);
         conquestmap.initLocations();
+        new Conquest().setVisible(true);
+        
     }
     
     //Initialisation methods - setting up GUI elements
+    private void setCloseOperations() {
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE); //Window will exit when close button is preseed.
+        this.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent evt) {
+                closeButtonPressed();
+            }
+        });
+    }
     private void setScreenParameters() {
         setLayout(null);
         setResizable(false);
         setSize(600, 400); //Screen size
-        setAlwaysOnTop(true);
+        
         setLocationRelativeTo(null);
         setLblUnitPower();
+        //setAlwaysOnTop(true);//This puts the window on top on start.
+        //setAlwaysOnTop(false); 
     }
     private void initControls() {
         /*
@@ -323,13 +351,6 @@ public class Conquest extends JFrame {
         progressbarPlayerTickets[p2].setForeground(blue);
         progressbarPlayerTickets[p2].setString("Tickets left: " + Integer.toString(intPlayer2Tickets));
         
-        //add(progressbarPlayer1);
-        //add(progressbarPlayer2);
-        /**
-         *  private JProgressBar progressbarPlayer1 = new JProgressBar(0, 100);
-            private JProgressBar progressbarPlayer2 = new JProgressBar(0, 100);
-            private JProgressBar[] progressbarPlayerTickets = new JProgressBar[2];
-         */
     }
     private void setButtonParameters() {
         //Sets the size and location of the buttons.
@@ -373,7 +394,7 @@ public class Conquest extends JFrame {
     }
     private void setLabelParameters() {//Sets the size and location of the labels.
         //label.setBounds(LocationX, LocationY, SizeX, SizeY
-        int boundaryX = this.getSize().width, boundaryY = this.getSize().height;
+        int boundaryX = 600, boundaryY = 340;
         
         lblUnit1Power.setBounds(boundaryX - 575, boundaryY - 205, 30, 10);
         lblUnit2Power.setBounds(boundaryX - 575, boundaryY - 155, 30, 10);
@@ -429,10 +450,13 @@ public class Conquest extends JFrame {
         }
         //Set label borders
         for (int i = 0; i < lblCapturePoint.length; i++) {
-            lblCapturePoint[i].setBorder(borderGrey);
+            setCapturePointLabelBorder(i, getCapturePointBorder(intCapturePointStatus[i]));
         }
         lblPlayer1.setBorder(borderRed);
         lblPlayer2.setBorder(borderBlue);
+    }
+    private void setCapturePointLabelBorder(int CaptureID, Border border) {
+        lblCapturePoint[CaptureID].setBorder(border);
     }
     
     //Unit management methods
@@ -633,7 +657,7 @@ public class Conquest extends JFrame {
         }
         if (allUnitsKilled) {
             msgBox("Both players' units are killed! It's a draw!", "Game Over!", "plain");
-            processWin(0, true, true);
+            processWin(0, true, true, 0); //No score because neither unit won
         }
         else {
             boolean allPlayer1UnitsKilled = true;
@@ -644,8 +668,10 @@ public class Conquest extends JFrame {
                 }
             }
             if (allPlayer1UnitsKilled) {
-                msgBox("All of " + stringPlayer1 + "'s units are dead! Player 2 wins!", "Game Over!", "plain");
-                processWin(2, true, false);
+                int winnerScore = calculateScore(2);
+                msgBox("All of " + stringPlayer1 + "'s units are dead! " + stringPlayer2 + " wins with a score of " + 
+                        Integer.toString(winnerScore) + "!", "Game Over!", "plain");
+                processWin(2, true, false, winnerScore);
             }
             
             boolean allPlayer2UnitsKilled = true;
@@ -656,8 +682,10 @@ public class Conquest extends JFrame {
                 }
             }
             if (allPlayer2UnitsKilled) {
-                msgBox("All of " + stringPlayer2 + "'s units are dead! Player 1 wins!", "Game Over!", "plain");
-                processWin(1, false, true);
+                int winnerScore = calculateScore(1);
+                msgBox("All of " + stringPlayer2 + "'s units are dead! " + stringPlayer1 + " wins with a score of "
+                        + Integer.toString(winnerScore) + "!", "Game Over!", "plain");
+                processWin(1, false, true, winnerScore);
             }
         }
     }
@@ -1086,6 +1114,7 @@ public class Conquest extends JFrame {
         }
         lblCurrentSelectedUnit.setText("<html><b>Current selected unit: </b>" + Integer.toString(unitNumber + 1) + "</html>");
         checkUnitsKilled(); //Check which units are killed so that they cannot be selected/upgraded.
+        checkPossibleCapture();
     }
     private void changeTurn() {
         //Processes switching the turn from a player to the other player.
@@ -1134,7 +1163,7 @@ public class Conquest extends JFrame {
     }
     private void rollDice() { //Generate a random integer between 1-6
         intNumMoves = (RandomIntGenerator(1, 6));
-        //intNumMoves = 100;
+        intNumMoves = 100;
         setNumTurnsLabel(intNumMoves);
         
         //Re-enable the buttons
@@ -1179,25 +1208,34 @@ public class Conquest extends JFrame {
         if (intPlayer1Tickets <= 0 || intPlayer2Tickets <= 0) {
             if (intPlayer1Tickets > intPlayer2Tickets && intPlayer1Tickets > 0) {
                 intPlayer2Tickets = 0;
-                msgBox(stringPlayer1 + " wins the game!", "Game Over!", "plain");
-                processWin(1, false, false);
+                int winnerScore = calculateScore(1);
+                msgBox("All of " + stringPlayer2 + "'s tickets have been depleted! " + stringPlayer1 + " wins with a score of " + 
+                        Integer.toString(winnerScore) + "!", "Game Over!", "plain");
+                processWin(1, false, false, winnerScore);
+                
             }
             else if (intPlayer2Tickets > intPlayer1Tickets && intPlayer2Tickets > 0) {
                 msgBox(stringPlayer2 + " wins the game!", "Game Over!", "plain");
                 intPlayer1Tickets = 0;
-                processWin(2, false, false);
+                int winnerScore = calculateScore(2);
+                msgBox("All of " + stringPlayer1 + "'s tickets have been depleted! " + stringPlayer2 + " wins with a score of " + 
+                        Integer.toString(winnerScore) + "!", "Game Over!", "plain");
+                processWin(2, false, false, winnerScore);
             }
             else {
                 intPlayer1Tickets = 0; intPlayer2Tickets = 0;
                 msgBox("Both players lost all their tickets at the same time! It's a draw!", "Game Over!", "plain");
-                processWin(0, false, false);
+                processWin(0, false, false, 0); //No score because neither unit won.
             }
             //TO DO: Scoresheet
         }
     }
-    private void processWin(int winner, boolean allUnitsKilledPlayer1, boolean allUnitsKilledPlayer2) {
+    private void processWin(int winner, boolean allUnitsKilledPlayer1, boolean allUnitsKilledPlayer2, int winnerScore) {
         //Closes game and announces the winner.
+        
         //if winner = 0, game is a draw.
+
+        //Disable GUI elements
         btnEndTurn.setEnabled(false);
         btnRollDice.setEnabled(false);
         toggleMoveCountButtonState(false, false);
@@ -1205,6 +1243,34 @@ public class Conquest extends JFrame {
         btnSelectUnit2.setEnabled(false);
         btnSelectUnit3.setEnabled(false);
         btnAttack.setEnabled(false);
+        
+        //Compare current score with high score
+        int currentHighScore = 0;
+        try {
+            currentHighScore = Integer.parseInt(read(stringHighScoreFile, "value"));
+        }
+        catch (Exception e) {
+            currentHighScore = 0;
+        }
+        if (winnerScore > currentHighScore) {
+            String winnerName = "";
+            if (winner == 1) {
+                winnerName = stringPlayer1;
+            }
+            else if (winner == 2) {
+                winnerName = stringPlayer2;
+            }
+            JOptionPane.showMessageDialog(this, winnerName + 
+                    " has beaten the high score! Congratulations!", "High Score Beaten!", JOptionPane.PLAIN_MESSAGE);
+            write(stringHighScoreFile, "playerName", winnerName);
+            write(stringHighScoreFile, "score", Integer.toString(winnerScore));
+        }
+        
+        //Disable save file
+        saveGame();
+        write(stringSaveFile, "gameFinished", "true");
+        
+        //Close control window and map windows
         this.setAlwaysOnTop(false);
         this.dispose();
         conquestmap.dispose();
@@ -1213,6 +1279,45 @@ public class Conquest extends JFrame {
         conquestscoresheet.setVisible(true);
         conquestscoresheet.setWinner(winner, stringPlayer1, stringPlayer2, intPlayer1Tickets, intPlayer2Tickets,
                 allUnitsKilledPlayer1, allUnitsKilledPlayer2);
+    }
+    private int calculateScore(int winner) {
+        int scoreOwnUnits = 0;
+        int scoreKilledUnits = 0;
+        int ticketsLeft = 0;
+        //Score algorithm: Score = number of own units left * number of enemy units killed * tickets left
+        switch (winner) {
+            case 0: //Draw - neither wins
+                //Do nothing
+                break;
+            case 1: //Player 1 wins
+                for (int i = 0; i < booleanUnitKilled.length - 3; i++) {
+                    if (!booleanUnitKilled[i]) { //For each own unit alive
+                        scoreOwnUnits++;
+                    }
+                }
+                for (int i = 3; i < booleanUnitKilled.length; i++) {
+                    if (booleanUnitKilled[i]) { //For each enemy unit dead
+                        scoreKilledUnits++;
+                    }
+                }
+                ticketsLeft = intPlayer1Tickets;
+                break;
+            case 2: //Player 2 wins
+                for (int i = 0; i < booleanUnitKilled.length - 3; i++) {
+                    if (booleanUnitKilled[i]) { //For each enemy unit alive
+                        scoreKilledUnits++;
+                    }
+                }
+                for (int i = 3; i < booleanUnitKilled.length; i++) {
+                    if (!booleanUnitKilled[i]) { //For each own unit dead
+                        scoreOwnUnits++;
+                    }
+                }
+                ticketsLeft = intPlayer2Tickets;
+                break;
+        }
+        int totalScore = scoreOwnUnits * scoreKilledUnits * ticketsLeft;
+        return totalScore;
     }
     private void updateProgressBars() { //Update the progress bars to the new values.
         int p1 = 0, p2 = 1; //Player numbers
@@ -1259,7 +1364,183 @@ public class Conquest extends JFrame {
             }
         }
     }
-    
+    private void saveGame() {
+        //Using FileAccessor API
+        
+        //Recreate the file
+        deleteFile(stringSaveFile);
+        regenFile(stringSaveFile);
+        
+        //Write the properties
+        write(stringSaveFile, "gameFinished", "false");
+        write(stringSaveFile, "stringPlayer1Name", stringPlayer1);
+        write(stringSaveFile, "stringPlayer2Name", stringPlayer2);
+
+        write(stringSaveFile, "intPlayer1TicketsLeft", Integer.toString(intPlayer1Tickets));
+        write(stringSaveFile, "intPlayer2TicketsLeft", Integer.toString(intPlayer2Tickets));
+
+        write(stringSaveFile, "booleanIsPlayer1Turn", Boolean.toString(booleanIsPlayer1Turn));
+        write(stringSaveFile, "booleanDiceRolled", Boolean.toString(booleanDiceRolled));
+        write(stringSaveFile, "intNumMoves", Integer.toString(intNumMoves));
+        //Unit Positions
+        int x = 0, y = 1; //Coordinate axes
+        write(stringSaveFile, "intUnit0PosX", Integer.toString(ConquestMap.intUnit1_1Coords[x]));
+        write(stringSaveFile, "intUnit0PosY", Integer.toString(ConquestMap.intUnit1_1Coords[y]));
+        write(stringSaveFile, "intUnit0Power", Integer.toString(intUnit1_1Power));
+        write(stringSaveFile, "booleanUnit0Killed", Boolean.toString(booleanUnitKilled[0]));
+
+        write(stringSaveFile, "intUnit1PosX", Integer.toString(ConquestMap.intUnit1_2Coords[x]));
+        write(stringSaveFile, "intUnit1PosY", Integer.toString(ConquestMap.intUnit1_2Coords[y]));
+        write(stringSaveFile, "intUnit1Power", Integer.toString(intUnit1_2Power));
+        write(stringSaveFile, "booleanUnit1Killed", Boolean.toString(booleanUnitKilled[1]));
+
+        write(stringSaveFile, "intUnit2PosX", Integer.toString(ConquestMap.intUnit1_3Coords[x]));
+        write(stringSaveFile, "intUnit2PosY", Integer.toString(ConquestMap.intUnit1_3Coords[y]));
+        write(stringSaveFile, "intUnit2Power", Integer.toString(intUnit1_3Power));
+        write(stringSaveFile, "booleanUnit2Killed", Boolean.toString(booleanUnitKilled[2]));
+
+        write(stringSaveFile, "intUnit3PosX", Integer.toString(ConquestMap.intUnit2_1Coords[x]));
+        write(stringSaveFile, "intUnit3PosY", Integer.toString(ConquestMap.intUnit2_1Coords[y]));
+        write(stringSaveFile, "intUnit3Power", Integer.toString(intUnit2_1Power));
+        write(stringSaveFile, "booleanUnit3Killed", Boolean.toString(booleanUnitKilled[3]));
+
+        write(stringSaveFile, "intUnit4PosX", Integer.toString(ConquestMap.intUnit2_2Coords[x]));
+        write(stringSaveFile, "intUnit4PosY", Integer.toString(ConquestMap.intUnit2_2Coords[y]));
+        write(stringSaveFile, "intUnit4Power", Integer.toString(intUnit2_2Power));
+        write(stringSaveFile, "booleanUnit4Killed", Boolean.toString(booleanUnitKilled[4]));
+
+        write(stringSaveFile, "intUnit5PosX", Integer.toString(ConquestMap.intUnit2_3Coords[x]));
+        write(stringSaveFile, "intUnit5PosY", Integer.toString(ConquestMap.intUnit2_3Coords[y]));
+        write(stringSaveFile, "intUnit5Power", Integer.toString(intUnit2_3Power));
+        write(stringSaveFile, "booleanUnit5Killed", Boolean.toString(booleanUnitKilled[5]));
+
+        write(stringSaveFile, "capturePointAOwnership", Integer.toString(ConquestMap.intCapturePointStatus[0]));
+        write(stringSaveFile, "capturePointBOwnership", Integer.toString(ConquestMap.intCapturePointStatus[1]));
+        write(stringSaveFile, "capturePointCOwnership", Integer.toString(ConquestMap.intCapturePointStatus[2]));
+        write(stringSaveFile, "capturePointDOwnership", Integer.toString(ConquestMap.intCapturePointStatus[3]));
+    }
+    private void checkGameSave() {
+        if (checkFileExists(stringSaveFile)) {
+            boolean gameFinished = true;
+            try {
+                gameFinished = Boolean.parseBoolean(read(stringSaveFile, "gameFinished"));
+                if (!gameFinished) {
+                    int confirmLoad = JOptionPane.showConfirmDialog(this, "<html><b>A saved game has been detected.</b> Would you like to resume the game?</html>"
+                            , "Save Game Detected", JOptionPane.YES_NO_OPTION);
+                    if (confirmLoad == 0) { //If yes
+                        //Load variables
+
+                        stringPlayer1 = read(stringSaveFile, "stringPlayer1Name");
+                        stringPlayer2 = read(stringSaveFile, "stringPlayer2Name");
+
+                        intPlayer1Tickets = Integer.parseInt(read(stringSaveFile, "intPlayer1TicketsLeft"));
+                        intPlayer2Tickets = Integer.parseInt(read(stringSaveFile, "intPlayer2TicketsLeft"));
+
+                        booleanIsPlayer1Turn = Boolean.parseBoolean(read(stringSaveFile, "booleanIsPlayer1Turn"));
+                        booleanDiceRolled = Boolean.parseBoolean(read(stringSaveFile, "booleanDiceRolled"));
+                        intNumMoves = Integer.parseInt(read(stringSaveFile, "intNumMoves"));
+
+                        //Unit positions
+                        int x = 0, y = 1; //Coordinate axes
+                        ConquestMap.intUnit1_1Coords[x] = Integer.parseInt(read(stringSaveFile, "intUnit0PosX"));
+                        ConquestMap.intUnit1_1Coords[y] = Integer.parseInt(read(stringSaveFile, "intUnit0PosY"));
+                        intUnit1_1Power = Integer.parseInt(read(stringSaveFile, "intUnit0Power"));
+                        booleanUnitKilled[0] = Boolean.parseBoolean(read(stringSaveFile, "booleanUnit0Killed"));
+
+                        ConquestMap.intUnit1_2Coords[x] = Integer.parseInt(read(stringSaveFile, "intUnit1PosX"));
+                        ConquestMap.intUnit1_2Coords[y] = Integer.parseInt(read(stringSaveFile, "intUnit1PosY"));
+                        intUnit1_2Power = Integer.parseInt(read(stringSaveFile, "intUnit1Power"));
+                        booleanUnitKilled[1] = Boolean.parseBoolean(read(stringSaveFile, "booleanUnit1Killed"));
+
+                        ConquestMap.intUnit1_3Coords[x] = Integer.parseInt(read(stringSaveFile, "intUnit2PosX"));
+                        ConquestMap.intUnit1_3Coords[y] = Integer.parseInt(read(stringSaveFile, "intUnit2PosY"));
+                        intUnit1_3Power = Integer.parseInt(read(stringSaveFile, "intUnit2Power"));
+                        booleanUnitKilled[2] = Boolean.parseBoolean(read(stringSaveFile, "booleanUnit2Killed"));
+
+                        ConquestMap.intUnit2_1Coords[x] = Integer.parseInt(read(stringSaveFile, "intUnit3PosX"));
+                        ConquestMap.intUnit2_1Coords[y] = Integer.parseInt(read(stringSaveFile, "intUnit3PosY"));
+                        intUnit2_1Power = Integer.parseInt(read(stringSaveFile, "intUnit3Power"));
+                        booleanUnitKilled[3] = Boolean.parseBoolean(read(stringSaveFile, "booleanUnit3Killed"));
+
+                        ConquestMap.intUnit2_2Coords[x] = Integer.parseInt(read(stringSaveFile, "intUnit4PosX"));
+                        ConquestMap.intUnit2_2Coords[y] = Integer.parseInt(read(stringSaveFile, "intUnit4PosY"));
+                        intUnit2_2Power = Integer.parseInt(read(stringSaveFile, "intUnit4Power"));
+                        booleanUnitKilled[4] = Boolean.parseBoolean(read(stringSaveFile, "booleanUnit4Killed"));
+
+                        ConquestMap.intUnit2_3Coords[x] = Integer.parseInt(read(stringSaveFile, "intUnit5PosX"));
+                        ConquestMap.intUnit2_3Coords[y] = Integer.parseInt(read(stringSaveFile, "intUnit5PosY"));
+                        intUnit2_3Power = Integer.parseInt(read(stringSaveFile, "intUnit5Power"));
+                        booleanUnitKilled[5] = Boolean.parseBoolean(read(stringSaveFile, "booleanUnit5Killed"));
+
+                        ConquestMap.intCapturePointStatus[0] = Integer.parseInt(read(stringSaveFile, "capturePointAOwnership"));
+                        ConquestMap.intCapturePointStatus[1] = Integer.parseInt(read(stringSaveFile, "capturePointBOwnership"));
+                        ConquestMap.intCapturePointStatus[2] = Integer.parseInt(read(stringSaveFile, "capturePointCOwnership"));
+                        ConquestMap.intCapturePointStatus[3] = Integer.parseInt(read(stringSaveFile, "capturePointDOwnership"));
+                        
+                        reloadGame();
+                    }
+                }
+            }
+            catch (Exception e) {
+                //If the save file cannot be fully read, Conquest will not be able to complete the save restore. This is detected if a general exception was caught
+                int confirmDelete = JOptionPane.showConfirmDialog(this, "Your save file was corrupted. Conquest was unable to read your save. Do you want to delete the save?",
+                        "Save file corrupted", JOptionPane.YES_NO_OPTION);
+                if (confirmDelete == 0) { //If yes 
+                    deleteFile(stringSaveFile);
+                }
+            }
+        }
+    }
+    private void reloadGame() {
+        //Reset labels
+        setLabelParameters();
+        //Place units on the correct spots on the map.
+        ConquestMap.initUnitLocations();
+        
+        //Remove killed units from the battlefield
+        for (int i = 0; i < booleanUnitKilled.length; i++) {
+            if (booleanUnitKilled[i]) {
+                ConquestMap.disableUnitGridOccupied(i);
+            }
+        }
+        //Display whose turn is it
+        if (booleanIsPlayer1Turn) {
+            stringPlayerTurn = stringPlayer1;
+        }
+        else {
+            stringPlayerTurn = stringPlayer2;
+        }
+        lblWhoseTurn.setText("<html><b>Turn: </b>" + stringPlayerTurn + "</html>");
+        
+        //Display unit power correctly
+        setLblUnitPower();
+        //Display amount of move left correctly
+        lblNumMoves.setText("<html><b>No. of moves left: </b>" + Integer.toString(intNumMoves) + "</html>");
+        //Disable move count buttons
+        toggleMoveCountButtonState(false, booleanDiceRolled);
+        
+        btnRollDice.setEnabled(!booleanDiceRolled);
+        checkUnitsKilled();
+        
+        //Reset selected units
+        for (int i = 0; i < booleanPlayer1UnitSelected.length; i++) {
+            booleanPlayer1UnitSelected[i] = false;
+        }
+        for (int i = 0; i < booleanPlayer2UnitSelected.length; i++) {
+            booleanPlayer2UnitSelected[i] = false;
+        }
+        
+        //Update progress bars
+        updateProgressBars();
+        
+        //Reset display of capture point statuses.
+        //for (int i = 0; i < lblCapturePoint.length; i++) {
+        //    setCapturePointLabelBorder(i, getCapturePointBorder(ConquestMap.intCapturePointStatus[i]));
+        //}
+        //Set unit selected to false.
+        booleanUnitSelected = false;
+        lblCurrentSelectedUnit.setText("<html><b>Current selected unit:</b> None</html>");
+    }
     //ActionEvent Responders - event driven methods for responding to button presses
     private void btnMoveUpPressed(ActionEvent evt) {
         if (booleanAttackMode) {
@@ -1318,8 +1599,8 @@ public class Conquest extends JFrame {
                 changeTurn();
             }
             else {
-                int confirmEndTurn = JOptionPane.showConfirmDialog(this, "You haven't used all your moves. "
-                    + "You cannot 'save' your moves for subsequent turns. Are you sure you want to end your turn?", 
+                int confirmEndTurn = JOptionPane.showConfirmDialog(this, "<html><b>You haven't used all your moves.</b> "
+                    + "You cannot 'save' your moves for subsequent turns. Are you sure you want to end your turn?</html>", 
                     "Confirm End Turn", JOptionPane.YES_NO_OPTION);
                 if (confirmEndTurn == 0) { //If yes
                     changeTurn();
@@ -1328,7 +1609,7 @@ public class Conquest extends JFrame {
             
         }
         else {
-            int confirmEndTurn = JOptionPane.showConfirmDialog(this, "You haven't rolled the dice. Are you sure you want to end your turn?", 
+            int confirmEndTurn = JOptionPane.showConfirmDialog(this, "<html><b>You haven't rolled the dice.</b> Are you sure you want to end your turn?</html>", 
                     "Confirm End Turn", JOptionPane.YES_NO_OPTION);
             if (confirmEndTurn == 0) { //If yes
                 changeTurn();
@@ -1362,7 +1643,48 @@ public class Conquest extends JFrame {
     private void btnCapturePressed(ActionEvent evt) {
         processCapture();
     }
-    
+    private void closeButtonPressed() {
+        int confirmClose = JOptionPane.showConfirmDialog(this, "<html><b>Would you like to save the game before exiting?</b> "
+                + "Click CANCEL if you would like to continue playing instead.</html?", "Confirm Quit", JOptionPane.YES_NO_CANCEL_OPTION);
+        switch (confirmClose) {
+            case 0: //If yes is pressed...
+                log("Saving and exiting...");
+                if (checkFileExists(stringSaveFile)) {
+                    int confirmOverwrite = JOptionPane.showConfirmDialog(this, "<html><b>A previous save was detected. Would you like to overwrite the save?</b>"
+                            + " Click NO to exit the game without saving. "
+                            + "Click CANCEL to continue playing instead.</html>", "Confirm Overwrite", JOptionPane.YES_NO_CANCEL_OPTION);
+                    switch (confirmOverwrite) {
+                        case 0: //If yes
+                            log("Overwriting previous save with user confirmation");
+                            saveGame();
+                            System.exit(0);
+                            break;
+                        case 1: //If no
+                            System.exit(0);
+                            break;
+                        case 2: //If cancel
+                            log("Exiting cancelled");
+                            break;
+                        default: break;
+                    }
+                }
+                else {
+                    saveGame();
+                }
+                saveGame();
+                System.exit(0);
+                break;
+            case 1: //If no is pressed...
+                log("Exiting without saving...");
+                System.exit(0);
+                break;
+            case 2: //If cancel is pressed..
+                log("Exiting cancelled");
+                break;
+            default:
+                break;
+        }
+    }
     //Auto-generated code below
     /**
      * This method is called from within the constructor to initialize the form.
