@@ -57,8 +57,12 @@ public class ConquestHowToPlay extends javax.swing.JDialog {
         lblHowToPlayImg2 = new javax.swing.JLabel();
         panel3 = new javax.swing.JPanel();
         lblHowToPlayImg3 = new javax.swing.JLabel();
+        panel4 = new javax.swing.JPanel();
+        lblHowToPlayImg4 = new javax.swing.JLabel();
+        btnDisplayPage4 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setResizable(false);
         getContentPane().setLayout(null);
 
         lblTitle.setFont(new java.awt.Font("Garamond", 1, 48)); // NOI18N
@@ -168,6 +172,37 @@ public class ConquestHowToPlay extends javax.swing.JDialog {
         getContentPane().add(panel3);
         panel3.setBounds(0, 76, 800, 430);
 
+        lblHowToPlayImg4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/io/github/whalesaredelicious/conquest/assets/HowToPlay4.png"))); // NOI18N
+
+        javax.swing.GroupLayout panel4Layout = new javax.swing.GroupLayout(panel4);
+        panel4.setLayout(panel4Layout);
+        panel4Layout.setHorizontalGroup(
+            panel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel4Layout.createSequentialGroup()
+                .addGap(55, 55, 55)
+                .addComponent(lblHowToPlayImg4)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        panel4Layout.setVerticalGroup(
+            panel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel4Layout.createSequentialGroup()
+                .addGap(25, 25, 25)
+                .addComponent(lblHowToPlayImg4)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        getContentPane().add(panel4);
+        panel4.setBounds(0, 73, 765, 370);
+
+        btnDisplayPage4.setText("Page 4");
+        btnDisplayPage4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDisplayPage4ActionPerformed(evt);
+            }
+        });
+        getContentPane().add(btnDisplayPage4);
+        btnDisplayPage4.setBounds(340, 510, 102, 43);
+
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
@@ -179,19 +214,30 @@ public class ConquestHowToPlay extends javax.swing.JDialog {
         panel1.setVisible(true);
         panel2.setVisible(false);
         panel3.setVisible(false);
+        panel4.setVisible(false);
     }//GEN-LAST:event_btnDisplayPage1ActionPerformed
 
     private void btnDisplayPage2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDisplayPage2ActionPerformed
         panel1.setVisible(false);
         panel2.setVisible(true);
         panel3.setVisible(false);
+        panel4.setVisible(false);
     }//GEN-LAST:event_btnDisplayPage2ActionPerformed
 
     private void btnDisplayPage3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDisplayPage3ActionPerformed
         panel1.setVisible(false);
         panel2.setVisible(false);
         panel3.setVisible(true);
+        panel4.setVisible(false);
+        
     }//GEN-LAST:event_btnDisplayPage3ActionPerformed
+
+    private void btnDisplayPage4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDisplayPage4ActionPerformed
+        panel1.setVisible(false);
+        panel2.setVisible(false);
+        panel3.setVisible(false);
+        panel4.setVisible(true);
+    }//GEN-LAST:event_btnDisplayPage4ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -239,13 +285,16 @@ public class ConquestHowToPlay extends javax.swing.JDialog {
     private javax.swing.JButton btnDisplayPage1;
     private javax.swing.JButton btnDisplayPage2;
     private javax.swing.JButton btnDisplayPage3;
+    private javax.swing.JButton btnDisplayPage4;
     private javax.swing.JButton btnExit;
     private javax.swing.JLabel lblHowToPlayImg1;
     private javax.swing.JLabel lblHowToPlayImg2;
     private javax.swing.JLabel lblHowToPlayImg3;
+    private javax.swing.JLabel lblHowToPlayImg4;
     private javax.swing.JLabel lblTitle;
     private javax.swing.JPanel panel1;
     private javax.swing.JPanel panel2;
     private javax.swing.JPanel panel3;
+    private javax.swing.JPanel panel4;
     // End of variables declaration//GEN-END:variables
 }

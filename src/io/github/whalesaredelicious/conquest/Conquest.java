@@ -1323,7 +1323,6 @@ public class Conquest extends JFrame {
         int p1 = 0, p2 = 1; //Player numbers
         double p1Progress = (intPlayer1Tickets/(double)intInitialPlayer1Tickets) * 100;
         double p2Progress = (intPlayer2Tickets/(double)intInitialPlayer2Tickets) * 100;
-        log("Player 1 Tickets left: " + Double.toString(p1Progress));
         progressbarPlayerTickets[p1].setValue((int) p1Progress);
         progressbarPlayerTickets[p1].setString("Tickets left: " + Integer.toString(intPlayer1Tickets));
         progressbarPlayerTickets[p2].setValue((int) p2Progress);
